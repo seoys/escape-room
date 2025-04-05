@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start -p 10040",
+    "start": "next start -p 10050",
     "lint": "next lint",
     "git:pull": "git pull",
     "pm2:start": "vlt r git:pull && vlt r build && pm2 start eco.config.js",
