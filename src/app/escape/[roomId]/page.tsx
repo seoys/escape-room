@@ -131,12 +131,12 @@ export default function RoomPage() {
       <div className="py-20">
         <div className="bg-black/80 w-[80%] max-w-6xl mx-auto rounded-3xl p-8 md:p-16 backdrop-blur-sm">
           <div style={{ height: "70px" }}></div>
-          <h1
+          <h2
             className={`${blackHanSans.className} md:text-6xl text-center mb-8 md:mb-12 tracking-wider text-white`}
             style={{ color: "#ffffff" }}
           >
             ROOM_{roomId}: {room.title}
-          </h1>
+          </h2>
           <div className="bg-slate-800/90 p-12 rounded-3xl mb-12 border-4 border-amber-500/50">
             <div style={{ height: "30px" }}></div>
             <div
@@ -153,6 +153,7 @@ export default function RoomPage() {
             </p>
             <div style={{ height: "30px" }}></div>
           </div>
+          <div style={{ height: "10px" }}></div>
           {showHint && (
             <div
               className="bg-amber-900/50 p-10 rounded-3xl mb-12 border-4 border-amber-400/30"
@@ -163,8 +164,12 @@ export default function RoomPage() {
               </p>
             </div>
           )}
+          <div style={{ height: "10px" }}></div>
           {error && (
-            <div className="bg-red-950/50 p-10 rounded-3xl mb-12 border-4 border-red-600/30">
+            <div
+              className="bg-red-950/50 p-10 rounded-3xl mb-12 border-4 border-red-600/30"
+              style={{ color: "#ffffff" }}
+            >
               <p className="text-2xl text-white text-center font-medium">
                 {error}
               </p>
