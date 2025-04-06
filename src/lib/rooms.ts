@@ -76,9 +76,9 @@ export const rooms: Room[] = [
   {
     id: 9,
     title: "글자 자물쇠",
-    question: "숫자를 찾고 글자를 찾아보세요.",
+    question: "숫자를 찾고 글자를 찾아보세요.(영어3글자)",
     answer: "NOX",
-    hint: "모든 메모를 읽어보세요.",
+    hint: "방의 모든 글자를 읽어보세요.",
     type: "number_lock",
     difficulty: 8.5,
   },
