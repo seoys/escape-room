@@ -8,9 +8,9 @@
     "start": "next start -p 10050",
     "lint": "next lint",
     "git:pull": "git pull",
-    "pm2:start": "vlt r git:pull && vlt r build && pm2 start eco.config.js",
+    "pm2:start": "pnpm git:pull && pnpm build && pm2 start eco.config.js",
     "pm2:stop": "pm2 stop eco.config.js",
-    "pm2:restart": "vlt r git:pull && vlt r build && pm2 restart eco.config.js",
+    "pm2:restart": "pnpm git:pull && pnpm build && pm2 restart eco.config.js",
     "pm2:delete": "pm2 delete eco.config.js",
     "pm2:logs": "pm2 logs",
     "pm2:monit": "pm2 monit"
@@ -24,22 +24,23 @@
     "ioredis": "^5.6.0",
     "lucide-react": "^0.487.0",
     "next": "^15.2.4",
+    "prettier": "^3.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "redis": "^4.7.0",
     "tailwind-merge": "^3.1.0",
-    "zustand": "^5.0.3",
-    "prettier": "^3.5.3"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "10.4.17",
     "eslint": "^9",
     "eslint-config-next": "^15.2.4",
-    "tailwindcss": "^4",
+    "postcss": "8.4.35",
+    "tailwindcss": "3.4.1",
     "typescript": "^5"
   }
 }
