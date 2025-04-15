@@ -165,7 +165,7 @@ export default function RoomPage() {
 								onChange={e => setAnswer(e.target.value)}
 								placeholder="정답을 입력하세요"
 								className="w-full h-17 md:h-48 px-4 md:px-8 bg-gray-900/70 rounded-2xl 
-                          text-xl md:text-2xl text-center text-white placeholder-gray-500 
+                          text-base md:text-lg text-center text-white placeholder-gray-500 
                           border-4 border-yellow-900/50 
                           focus:border-yellow-600/50 focus:outline-none 
                           transition-all duration-300
