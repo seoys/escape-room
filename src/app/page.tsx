@@ -15,15 +15,15 @@ export default function Home() {
 
   const handleStartClick = () => {
     initGame();
-    router.push("/escape/1");
+    router.push("/start");
   };
 
-  const handleContinueClick = () => {
-    const currentRoom = localStorage.getItem("currentRoom");
-    if (currentRoom) {
-      router.push(`/escape/${currentRoom}`);
-    }
-  };
+  // const handleContinueClick = () => {
+  //   const currentRoom = localStorage.getItem("currentRoom");
+  //   if (currentRoom) {
+  //     router.push(`/escape/${currentRoom}`);
+  //   }
+  // };
 
   return (
     <main className="main-background">
