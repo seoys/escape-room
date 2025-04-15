@@ -141,8 +141,8 @@ export default function RoomPage() {
 						</p>
 					</div>
 					{showHint && (
-						<div className="bg-amber-900/40 p-6 md:p-10 rounded-3xl mb-8 md:mb-12 border-4 border-amber-400/30">
-							<p className="text-lg md:text-xl text-amber-100 font-medium tracking-wide">
+						<div className="bg-amber-900/40 p-4 md:p-6 rounded-2xl mb-4 md:mb-6 border-2 border-amber-400/30">
+							<p className="text-m md:text-m text-amber-100 font-medium tracking-wide">
 								💡 힌트: {room.hint}
 							</p>
 						</div>
@@ -180,7 +180,7 @@ export default function RoomPage() {
 							<div className="flex gap-3 md:gap-4">
 								<button
 									type="submit"
-									className="h-12 md:h-14 flex-1
+									className="h-10 md:h-12 flex-1
                           bg-gradient-to-br from-green-500/90 to-green-700/90
                           hover:from-green-400/90 hover:to-green-600/90
                           rounded-xl text-base md:text-lg font-bold text-white tracking-wider
@@ -196,7 +196,7 @@ export default function RoomPage() {
 									type="button"
 									onClick={handleHint}
 									disabled={hintsRemaining === 0 || showHint}
-									className={`h-12 md:h-14 flex-1 rounded-xl text-base md:text-lg font-bold tracking-wide
+									className={`h-10 md:h-12 flex-1 rounded-xl text-base md:text-lg font-bold tracking-wide
                           transition-all duration-200 ease-out backdrop-blur-sm
                           ${
 								hintsRemaining > 0 && !showHint
@@ -211,7 +211,7 @@ export default function RoomPage() {
 								<button
 									type="button"
 									onClick={handleBack}
-									className="h-12 md:h-14 flex-1
+									className="h-10 md:h-12 flex-1
                           bg-gradient-to-br from-gray-600/90 to-gray-800/90
                           hover:from-gray-500/90 hover:to-gray-700/90
                           rounded-xl text-base md:text-lg font-bold text-white tracking-wider
@@ -226,7 +226,7 @@ export default function RoomPage() {
 								<button
 									type="button"
 									onClick={() => router.push('/')}
-									className="h-12 md:h-14 flex-1
+									className="h-10 md:h-12 flex-1
                           bg-gradient-to-br from-red-500/90 to-red-700/90
                           hover:from-red-400/90 hover:to-red-600/90
                           rounded-xl text-base md:text-lg font-bold text-white tracking-wider
