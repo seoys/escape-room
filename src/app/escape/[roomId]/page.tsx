@@ -148,8 +148,8 @@ export default function RoomPage() {
 						</div>
 					)}
 					{error && (
-						<div className="bg-red-950/40 p-6 md:p-10 rounded-3xl mb-8 md:mb-12 border-4 border-red-600/30">
-							<p className="text-lg md:text-xl text-white text-center font-medium">
+						<div className="bg-red-950/40 p-4 md:p-4 rounded-3xl mb-6 md:mb-8 border-4 border-red-600/30">
+							<p className="text-base md:text-lg text-white text-center font-medium">
 								{error}
 							</p>
 						</div>
