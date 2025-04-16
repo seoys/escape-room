@@ -67,7 +67,7 @@ export default function StartPage() {
 			roomId: 1,
 		};
 
-		const resp = await fetch(
+		await fetch(
 			`http://localhost:10000/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
 			{
 				method: 'POST',
