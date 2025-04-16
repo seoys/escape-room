@@ -25,7 +25,7 @@ export default function StartPage() {
 		}
 
 		const userData = await fetch(
-			`http://localhost:10000/v1/redis/search/escape_${name}`,
+			`https://api2.sosohappy.synology.me/v1/redis/search/escape_${name}`,
 		);
 
 		const userDataJson = await userData.json();
@@ -68,7 +68,7 @@ export default function StartPage() {
 		};
 
 		await fetch(
-			`http://localhost:10000/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
+			`https://api2.sosohappy.synology.me/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
 			{
 				method: 'POST',
 			},
