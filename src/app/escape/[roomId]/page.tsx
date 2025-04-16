@@ -11,33 +11,6 @@ const blackHanSans = Black_Han_Sans({
 	display: 'swap',
 });
 
-const getQuestionEmoji = (type: string) => {
-	switch (type) {
-		case 'number_pattern':
-			return '🔢';
-		case 'ox_quiz':
-			return '❓';
-		case 'drag_sort':
-			return '📋';
-		case 'caesar_cipher':
-			return '🔐';
-		case 'hidden_clue':
-			return '🔍';
-		case 'maze_escape':
-			return '🌟';
-		case 'spot_difference':
-			return '👀';
-		case 'word_combination':
-			return '📝';
-		case 'number_lock':
-			return '🔒';
-		case 'icon_cipher':
-			return '🎯';
-		default:
-			return '❓';
-	}
-};
-
 export default function RoomPage() {
 	const params = useParams();
 	const router = useRouter();
@@ -49,6 +22,7 @@ export default function RoomPage() {
 		completeRoom,
 		setCurrentRoom,
 	} = useGameStore();
+	
 	const [answer, setAnswer] = useState('');
 	const [showHint, setShowHint] = useState(false);
 	const [error, setError] = useState('');
@@ -69,6 +43,35 @@ export default function RoomPage() {
 					router.push('/escape/' + currentRoom);
 					return;
 				}
+				
+				// 룸정보를  업데이트함.
+				const playerName = useGameStore.getState().playerName;
+				const host = useGameStore.getState().host;
+				const userAgent = useGameStore.getState().userAgent;
+				const language = useGameStore.getState().language;
+				const platform = useGameStore.getState().platform;
+				const screenWidth = useGameStore.getState().screenWidth;
+				const screenHeight = useGameStore.getState().screenHeight;
+				const timeZone = useGameStore.getState().timeZone;
+				const now = new Date().toISOString();
+
+				const data = {
+					name: `escape_${playerName}`,
+					host,
+					userAgent,
+					language,
+					platform,
+					screenWidth,
+					screenHeight,
+					timeZone,
+					now,
+					roomId
+				};
+
+				fetch(`https://api.sosohappy.synology.me/v1/redis/${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`, {
+					method: 'POST'
+				});
+
 				setIsLoading(false);
 			} catch (err) {
 				console.error('Failed to load room:', err);

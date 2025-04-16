@@ -3,19 +3,79 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-
+import { useGameStore } from '@/store/gameStore';
 export default function StartPage() {
 	const [name, setName] = useState('');
 	const router = useRouter();
 
-	const handleStart = () => {
+	const handleStart = async () => {
+		const host: string = window.location.hostname;
+		const userAgent: string = window.navigator.userAgent;
+		const language: string = window.navigator.language;
+		const platform: string = window.navigator.platform;
+		const screenWidth: number = window.screen.width;
+		const screenHeight: number = window.screen.height;
+		const timeZone: string = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		const now: string = new Date().toISOString();
+
 		if (!name.trim()) {
 			alert('이름을 입력해주세요.');
 			return;
 		}
+
+		const userData = await fetch(`https://api.sosohappy.synology.me/v1/redis/escape_${name}`);
+
+		const userDataJson = await userData.json();
+		
+		if (userDataJson.result) { 
+			const userInfo = JSON.parse(userDataJson.result);
+
+			if (userInfo.name == name ||
+				userInfo.host == host ||
+				userInfo.userAgent == userAgent ||
+				userInfo.language == language ||
+				userInfo.platform == platform ||
+				userInfo.screenWidth == screenWidth ||
+				userInfo.screenHeight == screenHeight ||
+				userInfo.timeZone == timeZone) {
+				
+				alert('이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.');
+				router.push(`/escape/${userInfo.roomId}`); 
+				return;
+			}
+		}
+
+		
+
+		const data = {
+			name : `escape_${name}`,
+			host,
+			userAgent,
+			language,
+			platform,
+			screenWidth,
+			screenHeight,
+			timeZone,
+			now,
+			roomId: 1
+		};
+
+
+		fetch(`https://api.sosohappy.synology.me/v1/redis/${name}?data=${encodeURIComponent(JSON.stringify(data))}`, {
+			method: 'POST'
+		});
+
 		// 추후 전역 상태 저장도 가능
 		// 예: useGameStore.getState().setPlayerName(name);
-		router.push('/escape/1'); // 다음 페이지 경로
+		useGameStore.getState().setPlayerName(name);
+		useGameStore.getState().setHost(host);
+		useGameStore.getState().setUserAgent(userAgent);
+		useGameStore.getState().setLanguage(language);
+		useGameStore.getState().setPlatform(platform);
+		useGameStore.getState().setScreenWidth(screenWidth);
+		useGameStore.getState().setScreenHeight(screenHeight);
+		useGameStore.getState().setTimeZone(timeZone);
+		// router.push('/escape/1'); // 다음 페이지 경로
 	};
 
 	return (
