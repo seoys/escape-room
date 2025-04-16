@@ -25,12 +25,13 @@ export default function StartPage() {
 		}
 
 		const userData = await fetch(
-			`https://api.sosohappy.synology.me/v1/redis/escape_${name}`,
+			`http://localhost:10000/v1/redis/search/escape_${name}`,
 		);
 
 		const userDataJson = await userData.json();
 
-		if (userDataJson.result) {
+		if (userDataJson.result.data) {
+			console.log('userDataJson', userDataJson);
 			const userInfo = JSON.parse(userDataJson.result);
 
 			if (
@@ -66,8 +67,8 @@ export default function StartPage() {
 			roomId: 1,
 		};
 
-		fetch(
-			`https://api.sosohappy.synology.me/v1/redis/${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
+		const resp = await fetch(
+			`http://localhost:10000/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
 			{
 				method: 'POST',
 			},
