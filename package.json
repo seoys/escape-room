@@ -10,6 +10,8 @@
     "build": "next build",
     "start": "next start -p 10050",
     "lint": "next lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "git:pull": "git pull",
     "pm2:start": "pnpm git:pull && pnpm build && pm2 start eco.config.js",
     "pm2:stop": "pm2 stop eco.config.js",

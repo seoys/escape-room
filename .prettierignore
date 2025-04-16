@@ -11,3 +11,14 @@ appspec.yml
 artillery.yaml
 
 .prettierrc.cjs
+
+.next
+node_modules
+build
+dist
+coverage
+.vercel
+public
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
