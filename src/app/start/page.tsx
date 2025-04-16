@@ -15,7 +15,8 @@ export default function StartPage() {
 		const platform: string = window.navigator.platform;
 		const screenWidth: number = window.screen.width;
 		const screenHeight: number = window.screen.height;
-		const timeZone: string = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		const timeZone: string =
+			Intl.DateTimeFormat().resolvedOptions().timeZone;
 		const now: string = new Date().toISOString();
 
 		if (!name.trim()) {
@@ -23,32 +24,37 @@ export default function StartPage() {
 			return;
 		}
 
-		const userData = await fetch(`https://api.sosohappy.synology.me/v1/redis/escape_${name}`);
+		const userData = await fetch(
+			`https://api.sosohappy.synology.me/v1/redis/escape_${name}`,
+		);
 
 		const userDataJson = await userData.json();
-		
-		if (userDataJson.result) { 
+
+		if (userDataJson.result) {
 			const userInfo = JSON.parse(userDataJson.result);
 
-			if (userInfo.name == name ||
+			if (
+				userInfo.name == name ||
 				userInfo.host == host ||
 				userInfo.userAgent == userAgent ||
 				userInfo.language == language ||
 				userInfo.platform == platform ||
 				userInfo.screenWidth == screenWidth ||
 				userInfo.screenHeight == screenHeight ||
-				userInfo.timeZone == timeZone) {
-				
-				alert('이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.');
-				router.push(`/escape/${userInfo.roomId}`); 
+				userInfo.timeZone == timeZone
+			) {
+				alert(
+					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
+				);
+				router.push(`/escape/${userInfo.roomId}`);
 				return;
+			} else {
+				router.push(`/escape/1`);
 			}
 		}
 
-		
-
 		const data = {
-			name : `escape_${name}`,
+			name: `escape_${name}`,
 			host,
 			userAgent,
 			language,
@@ -57,13 +63,15 @@ export default function StartPage() {
 			screenHeight,
 			timeZone,
 			now,
-			roomId: 1
+			roomId: 1,
 		};
 
-
-		fetch(`https://api.sosohappy.synology.me/v1/redis/${name}?data=${encodeURIComponent(JSON.stringify(data))}`, {
-			method: 'POST'
-		});
+		fetch(
+			`https://api.sosohappy.synology.me/v1/redis/${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
+			{
+				method: 'POST',
+			},
+		);
 
 		// 추후 전역 상태 저장도 가능
 		// 예: useGameStore.getState().setPlayerName(name);
