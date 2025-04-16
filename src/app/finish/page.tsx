@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 export default function FinishPage() {
 	const { startTime, endTime } = useGameStore();
-	const [topUser, setTopUser] = useState<string[]>([]);
+	// const [topUser, setTopUser] = useState<string[]>([]);
 
 	const calculateTime = () => {
 		if (!startTime || !endTime) return '시간 정보 없음';

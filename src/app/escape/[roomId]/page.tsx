@@ -22,7 +22,7 @@ export default function RoomPage() {
 		completeRoom,
 		setCurrentRoom,
 	} = useGameStore();
-	
+
 	const [answer, setAnswer] = useState('');
 	const [showHint, setShowHint] = useState(false);
 	const [error, setError] = useState('');
@@ -43,7 +43,7 @@ export default function RoomPage() {
 					router.push('/escape/' + currentRoom);
 					return;
 				}
-				
+
 				// 룸정보를  업데이트함.
 				const playerName = useGameStore.getState().playerName;
 				const host = useGameStore.getState().host;
@@ -65,12 +65,15 @@ export default function RoomPage() {
 					screenHeight,
 					timeZone,
 					now,
-					roomId
+					roomId,
 				};
 
-				fetch(`https://api.sosohappy.synology.me/v1/redis/${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`, {
-					method: 'POST'
-				});
+				fetch(
+					`https://api.sosohappy.synology.me/v1/redis/${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
+					{
+						method: 'POST',
+					},
+				);
 
 				setIsLoading(false);
 			} catch (err) {
