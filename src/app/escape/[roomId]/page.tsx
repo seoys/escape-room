@@ -69,7 +69,7 @@ export default function RoomPage() {
 				};
 
 				fetch(
-					`https://localhost:10000/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
+					`https://api2.sosohappy.synology.me/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
 					{
 						method: 'POST',
 					},
