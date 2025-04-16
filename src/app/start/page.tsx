@@ -83,7 +83,8 @@ export default function StartPage() {
 		useGameStore.getState().setScreenWidth(screenWidth);
 		useGameStore.getState().setScreenHeight(screenHeight);
 		useGameStore.getState().setTimeZone(timeZone);
-		// router.push('/escape/1'); // 다음 페이지 경로
+
+		router.push('/escape/1'); // 다음 페이지 경로
 	};
 
 	return (
