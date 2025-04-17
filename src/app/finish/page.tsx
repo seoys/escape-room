@@ -29,22 +29,14 @@ export default function FinishPage() {
 			const playerName = useGameStore.getState().playerName;
 			const host = useGameStore.getState().host;
 			const userAgent = useGameStore.getState().userAgent;
-			const language = useGameStore.getState().language;
 			const platform = useGameStore.getState().platform;
-			const screenWidth = useGameStore.getState().screenWidth;
-			const screenHeight = useGameStore.getState().screenHeight;
-			const timeZone = useGameStore.getState().timeZone;
 			const now = new Date().toISOString();
 
 			const data = {
 				name: `escape_${playerName}`,
 				host,
 				userAgent,
-				language,
 				platform,
-				screenWidth,
-				screenHeight,
-				timeZone,
 				now,
 				roomId: 10,
 				seconds: calculateSeconds(),
