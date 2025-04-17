@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { GameState } from '@/types/room';
-
+import { getBrowserInfo, getIpAddress } from '@/lib/utils/userInfo';
 interface GameStore extends GameState {
-	initGame: () => void;
+	initGame: () => Promise<void>;
 	setCurrentRoom: (roomId: number) => void;
 	consumeHint: () => void;
 	completeRoom: (roomId: number) => void;
@@ -25,8 +25,11 @@ const store = set => ({
 	userAgent: '',
 	platform: '',
 
-	initGame: () => {
+	initGame: async () => {
 		localStorage.removeItem('currentRoom');
+		const host = await getIpAddress();
+		const browserInfo = await getBrowserInfo();
+
 		set({
 			currentRoom: 1,
 			hintsRemaining: 3,
@@ -34,9 +37,9 @@ const store = set => ({
 			startTime: new Date(),
 			endTime: undefined,
 			playerName: '',
-			host: '',
-			userAgent: '',
-			platform: '',
+			host: host,
+			userAgent: browserInfo.userAgent,
+			platform: browserInfo.platform,
 		});
 	},
 

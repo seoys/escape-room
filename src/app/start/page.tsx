@@ -4,41 +4,30 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
-import { getBrowserInfo, getIpAddress } from '@/lib/utils/userInfo';
 
 export default function StartPage() {
 	const [name, setName] = useState('');
-	const [browserInfo, setBrowserInfo] = useState({});
-	const [ipAddress, setIpAddress] = useState('');
-
 	const router = useRouter();
+	const { setCurrentRoom } = useGameStore();
 
 	useEffect(() => {
-		userInfo();
+		const init = async () => {
+			try {
+				await useGameStore.getState().initGame();
+			} catch (error) {
+				console.error('초기화 실패:', error);
+			}
+		};
+		init();
 	}, []);
 
-	const userInfo = async () => {
-		const browserInfo = await getBrowserInfo();
-		const ipAddress = await getIpAddress();
-
-		setBrowserInfo(browserInfo);
-		setIpAddress(ipAddress);
-	};
-
 	const handleStart = async () => {
-		// if (!name.trim()) {
-		// 	alert('이름을 입력해주세요.');
-		// 	return;
-		// }
+		if (!name.trim()) {
+			alert('이름을 입력해주세요.');
+			return;
+		}
 
-		const data = {
-			name: `escape_${name}`,
-			host: ipAddress,
-			userAgent: browserInfo.userAgent,
-			platform: browserInfo.platform,
-			now: new Date().toISOString(),
-			roomId: 1,
-		};
+		await useGameStore.getState().setPlayerName(name);
 
 		const userData = await fetch(
 			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}`,
@@ -50,19 +39,29 @@ export default function StartPage() {
 
 			if (
 				userInfo.name == name ||
-				userInfo.host == ipAddress ||
-				userInfo.userAgent == browserInfo.userAgent ||
-				userInfo.platform == browserInfo.platform
+				userInfo.host == useGameStore.getState().host ||
+				userInfo.userAgent == useGameStore.getState().userAgent ||
+				userInfo.platform == useGameStore.getState().platform
 			) {
 				alert(
 					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
 				);
+				setCurrentRoom(parseInt(userInfo.roomId));
 				router.push(`/escape/${userInfo.roomId}`);
 				return;
 			} else {
 				router.push(`/escape/1`);
 			}
 		}
+
+		const data = {
+			name: `escape_${name}`,
+			host: useGameStore.getState().host,
+			userAgent: useGameStore.getState().userAgent,
+			platform: useGameStore.getState().platform,
+			now: new Date().toISOString(),
+			roomId: 1,
+		};
 
 		await fetch(
 			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
@@ -71,14 +70,14 @@ export default function StartPage() {
 			},
 		);
 
+		router.push('/escape/1'); // 다음 페이지 경로
+
 		// 추후 전역 상태 저장도 가능
 		// 예: useGameStore.getState().setPlayerName(name);
-		useGameStore.getState().setPlayerName(name);
-		useGameStore.getState().setHost(ipAddress);
-		useGameStore.getState().setUserAgent(browserInfo.userAgent);
-		useGameStore.getState().setPlatform(browserInfo.platform);
 
-		router.push('/escape/1'); // 다음 페이지 경로
+		// useGameStore.getState().setHost(ipAddress);
+		// useGameStore.getState().setUserAgent(browserInfo.userAgent);
+		// useGameStore.getState().setPlatform(browserInfo.platform);
 	};
 
 	return (

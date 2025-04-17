@@ -27,7 +27,6 @@ export default function RoomPage() {
 	const [showHint, setShowHint] = useState(false);
 	const [error, setError] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
-	const [playerName, setPlayerName] = useState('');
 
 	useEffect(() => {
 		const savedRoom = localStorage.getItem('currentRoom');
@@ -45,7 +44,7 @@ export default function RoomPage() {
 					return;
 				}
 
-				setPlayerName(useGameStore.getState().playerName);
+				const playerName = localStorage.getItem('playerName');
 				const userHost = localStorage.getItem('userHost');
 				const userAgent = localStorage.getItem('userAgent');
 				const userPlatform = localStorage.getItem('userPlatform');
