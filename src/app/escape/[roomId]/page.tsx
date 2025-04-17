@@ -28,6 +28,17 @@ export default function RoomPage() {
 	const [error, setError] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
 
+	// 룸정보를  업데이트함.
+	const playerName = useGameStore.getState().playerName;
+	const host = useGameStore.getState().host;
+	const userAgent = useGameStore.getState().userAgent;
+	const language = useGameStore.getState().language;
+	const platform = useGameStore.getState().platform;
+	const screenWidth = useGameStore.getState().screenWidth;
+	const screenHeight = useGameStore.getState().screenHeight;
+	const timeZone = useGameStore.getState().timeZone;
+	const now = new Date().toISOString();
+
 	useEffect(() => {
 		const savedRoom = localStorage.getItem('currentRoom');
 		if (savedRoom) {
@@ -43,17 +54,6 @@ export default function RoomPage() {
 					router.push('/escape/' + currentRoom);
 					return;
 				}
-
-				// 룸정보를  업데이트함.
-				const playerName = useGameStore.getState().playerName;
-				const host = useGameStore.getState().host;
-				const userAgent = useGameStore.getState().userAgent;
-				const language = useGameStore.getState().language;
-				const platform = useGameStore.getState().platform;
-				const screenWidth = useGameStore.getState().screenWidth;
-				const screenHeight = useGameStore.getState().screenHeight;
-				const timeZone = useGameStore.getState().timeZone;
-				const now = new Date().toISOString();
 
 				const data = {
 					name: `escape_${playerName}`,

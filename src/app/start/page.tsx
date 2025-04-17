@@ -31,7 +31,6 @@ export default function StartPage() {
 		const userDataJson = await userData.json();
 
 		if (userDataJson.result.data) {
-			console.log('userDataJson', userDataJson);
 			const userInfo = JSON.parse(userDataJson.result);
 
 			if (

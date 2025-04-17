@@ -15,7 +15,7 @@ export const rooms: Room[] = [
 		title: '도둑 찾기',
 		question:
 			"세 명의 용의자 A, B, C가 있습니다. 한 명은 도둑이고, 나머지 두 명은 진실을 말합니다. A는 'B가 도둑이다'라고 말했고, B는 'C가 도둑이다'라고 말했고, C는 '나는 도둑이 아니다'라고 말했습니다. 누가 도둑일까요?",
-		answer: 'C',
+		answer: 'B',
 		hint: '진실을 말하는 사람의 진술은 모두 일치해야 합니다.',
 		type: '추리',
 		difficulty: 6,
