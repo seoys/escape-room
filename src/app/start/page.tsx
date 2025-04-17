@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
@@ -9,17 +9,6 @@ export default function StartPage() {
 	const [name, setName] = useState('');
 	const router = useRouter();
 	const { setCurrentRoom } = useGameStore();
-
-	useEffect(() => {
-		const init = async () => {
-			try {
-				await useGameStore.getState().initGame();
-			} catch (error) {
-				console.error('초기화 실패:', error);
-			}
-		};
-		init();
-	}, []);
 
 	const handleStart = async () => {
 		if (!name.trim()) {
@@ -39,9 +28,9 @@ export default function StartPage() {
 
 			if (
 				userInfo.name == name ||
-				userInfo.host == useGameStore.getState().host ||
-				userInfo.userAgent == useGameStore.getState().userAgent ||
-				userInfo.platform == useGameStore.getState().platform
+				userInfo.host == localStorage.getItem('userHost') ||
+				userInfo.userAgent == localStorage.getItem('userAgent') ||
+				userInfo.platform == localStorage.getItem('userPlatform')
 			) {
 				alert(
 					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
@@ -62,9 +51,9 @@ export default function StartPage() {
 
 		const data = {
 			name: `escape_${name}`,
-			host: useGameStore.getState().host,
-			userAgent: useGameStore.getState().userAgent,
-			platform: useGameStore.getState().platform,
+			host: localStorage.getItem('userHost'),
+			userAgent: localStorage.getItem('userAgent'),
+			platform: localStorage.getItem('userPlatform'),
 			now: new Date().toISOString(),
 			roomId: 1,
 		};
@@ -89,7 +78,7 @@ export default function StartPage() {
 	return (
 		<main className="min-h-screen flex items-center justify-center relative overflow-hidden">
 			<Image
-				src="/images/start_background.png"
+				src="/images/start_background.webp"
 				alt="배경 이미지"
 				fill
 				className="object-cover"

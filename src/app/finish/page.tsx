@@ -64,7 +64,7 @@ export default function FinishPage() {
 	return (
 		<main className="min-h-screen flex items-center justify-center relative overflow-hidden">
 			<Image
-				src="/images/finish_background.png"
+				src="/images/finish_background.webp"
 				alt="배경 이미지"
 				fill
 				className="object-cover"
