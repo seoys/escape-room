@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 export default function FinishPage() {
 	const { startTime, endTime } = useGameStore();
+	const playerName = localStorage.getItem('playerName');
 	const [topUsers, setTopUsers] = useState<
 		{ name: string; seconds: number }[]
 	>([]);
@@ -55,7 +56,7 @@ export default function FinishPage() {
 					</p>
 					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner">
 						<p className="text-lg font-medium text-orange-900">
-							이름: {localStorage.getItem('playerName')}
+							이름: {playerName}
 						</p>
 						<p className="text-lg font-medium text-orange-900">
 							총 소요 시간: {calculateTime()}
