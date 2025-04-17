@@ -30,7 +30,7 @@ const store = set => ({
 		localStorage.setItem('userHost', host.toString());
 		localStorage.setItem('userAgent', browserInfo.userAgent);
 		localStorage.setItem('userPlatform', browserInfo.platform);
-
+		localStorage.setItem('startTime', new Date().toISOString());
 		set({
 			currentRoom: 1,
 			hintsRemaining: 3,

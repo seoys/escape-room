@@ -18,34 +18,8 @@ export default function FinishPage() {
 		return `${minutes}분 ${seconds}초`;
 	};
 
-	const calculateSeconds = () => {
-		if (!startTime || !endTime) return '시간 정보 없음';
-		const diff = endTime.getTime() - startTime.getTime();
-		const seconds = Math.floor((diff % 60000) / 1000);
-		return seconds;
-	};
-
 	useEffect(() => {
-		const updateRedis = async () => {
-			const playerName = localStorage.getItem('playerName');
-
-			const data = {
-				name: `escape_${playerName}`,
-				host: localStorage.getItem('userHost'),
-				userAgent: localStorage.getItem('userAgent'),
-				platform: localStorage.getItem('userPlatform'),
-				now: new Date().toISOString(),
-				roomId: 'finish',
-				seconds: calculateSeconds(),
-			};
-
-			fetch(
-				`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
-				{
-					method: 'POST',
-				},
-			);
-
+		const fetchTopUsers = async () => {
 			const topUser = await fetch(
 				`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/search/escape_`,
 			);
@@ -58,7 +32,8 @@ export default function FinishPage() {
 
 			setTopUsers(filteredTopUser);
 		};
-		updateRedis();
+
+		fetchTopUsers();
 	}, []);
 
 	return (

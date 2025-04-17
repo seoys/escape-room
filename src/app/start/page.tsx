@@ -32,14 +32,18 @@ export default function StartPage() {
 				userInfo.userAgent == localStorage.getItem('userAgent') ||
 				userInfo.platform == localStorage.getItem('userPlatform')
 			) {
-				alert(
-					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
-				);
-
 				if (userInfo.roomId === 'finish') {
+					alert(
+						'이 이름은 이미 게임을 완료하였습니다. 랭킹페이지로 이동합니다.',
+					);
+
 					router.push('/finish');
 					return;
 				}
+
+				alert(
+					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
+				);
 
 				setCurrentRoom(parseInt(userInfo.roomId));
 				router.push(`/escape/${userInfo.roomId}`);
@@ -54,7 +58,7 @@ export default function StartPage() {
 			host: localStorage.getItem('userHost'),
 			userAgent: localStorage.getItem('userAgent'),
 			platform: localStorage.getItem('userPlatform'),
-			now: new Date().toISOString(),
+			now: localStorage.getItem('startTime'),
 			roomId: 1,
 		};
 

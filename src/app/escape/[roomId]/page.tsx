@@ -51,7 +51,7 @@ export default function RoomPage() {
 					host: localStorage.getItem('userHost'),
 					userAgent: localStorage.getItem('userAgent'),
 					platform: localStorage.getItem('userPlatform'),
-					now: new Date().toISOString(),
+					now: localStorage.getItem('startTime'),
 					roomId,
 				};
 
@@ -74,11 +74,38 @@ export default function RoomPage() {
 	const room = rooms.find(r => r.id === roomId);
 	if (isLoading || !room) return <div className="text-white">Loading...</div>;
 
+	const calculateSeconds = () => {
+		const diff =
+			new Date().getTime() -
+			new Date(localStorage.getItem('startTime') as string).getTime();
+		const seconds = Math.floor((diff % 60000) / 1000);
+		return seconds;
+	};
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (answer.toLowerCase() === room.answer.toLowerCase()) {
 			completeRoom(roomId);
 			if (roomId === 10) {
+				const playerName = localStorage.getItem('playerName');
+
+				const data = {
+					name: `escape_${playerName}`,
+					host: localStorage.getItem('userHost'),
+					userAgent: localStorage.getItem('userAgent'),
+					platform: localStorage.getItem('userPlatform'),
+					roomId: 'finish',
+					now: localStorage.getItem('startTime'),
+					seconds: calculateSeconds(),
+				};
+
+				fetch(
+					`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
+					{
+						method: 'POST',
+					},
+				);
+
 				router.push('/finish');
 			} else {
 				setCurrentRoom(roomId + 1);
