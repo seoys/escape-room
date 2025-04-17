@@ -85,7 +85,8 @@ export default function RoomPage() {
 		const diff =
 			new Date().getTime() -
 			new Date(localStorage.getItem('startTime') as string).getTime();
-		const seconds = Math.floor((diff % 60000) / 1000);
+
+		const seconds = Math.floor(diff / 1000);
 		return seconds;
 	};
 
@@ -103,6 +104,7 @@ export default function RoomPage() {
 					platform: localStorage.getItem('userPlatform'),
 					roomId: 'finish',
 					now: localStorage.getItem('startTime'),
+					end: new Date().toISOString(),
 					seconds: calculateSeconds(),
 				};
 
