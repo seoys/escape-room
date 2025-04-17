@@ -40,8 +40,6 @@ export default function StartPage() {
 			roomId: 1,
 		};
 
-		console.log(data);
-
 		const userData = await fetch(
 			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}`,
 		);
