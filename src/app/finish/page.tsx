@@ -55,6 +55,9 @@ export default function FinishPage() {
 					</p>
 					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner">
 						<p className="text-lg font-medium text-orange-900">
+							이름: {localStorage.getItem('playerName')}
+						</p>
+						<p className="text-lg font-medium text-orange-900">
 							총 소요 시간: {calculateTime()}
 						</p>
 					</div>
@@ -70,6 +73,10 @@ export default function FinishPage() {
 								>
 									<div className="flex items-center gap-2">
 										<span className="font-bold text-orange-600 w-8">
+											{index === 0 && '🥇'}
+											{index === 1 && '🥈'}
+											{index === 2 && '🥉'}
+											{index > 2 && '🎖️'}
 											{index + 1}위
 										</span>
 										<span className="font-medium">
