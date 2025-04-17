@@ -45,17 +45,13 @@ export default function RoomPage() {
 				}
 
 				const playerName = localStorage.getItem('playerName');
-				const userHost = localStorage.getItem('userHost');
-				const userAgent = localStorage.getItem('userAgent');
-				const userPlatform = localStorage.getItem('userPlatform');
-				const now = new Date().toISOString();
 
 				const data = {
 					name: `escape_${playerName}`,
-					host: userHost,
-					userAgent,
-					platform: userPlatform,
-					now,
+					host: localStorage.getItem('userHost'),
+					userAgent: localStorage.getItem('userAgent'),
+					platform: localStorage.getItem('userPlatform'),
+					now: new Date().toISOString(),
 					roomId,
 				};
 
@@ -119,7 +115,7 @@ export default function RoomPage() {
 					left: 0,
 					width: '100%',
 					height: '100%',
-					backgroundImage: `url(/images/escape_room_${roomId}.png)`,
+					backgroundImage: `url(/images/escape_room_${roomId}.webp)`,
 					backgroundSize: 'cover',
 					backgroundAttachment: 'fixed',
 					zIndex: -1,

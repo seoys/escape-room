@@ -46,6 +46,12 @@ export default function StartPage() {
 				alert(
 					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
 				);
+
+				if (userInfo.roomId === 'finish') {
+					router.push('/finish');
+					return;
+				}
+
 				setCurrentRoom(parseInt(userInfo.roomId));
 				router.push(`/escape/${userInfo.roomId}`);
 				return;

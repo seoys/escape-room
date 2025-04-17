@@ -2,11 +2,13 @@
 import Link from 'next/link';
 import { useGameStore } from '@/store/gameStore';
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function FinishPage() {
 	const { startTime, endTime } = useGameStore();
-	// const [topUser, setTopUser] = useState<string[]>([]);
+	const [topUsers, setTopUsers] = useState<
+		{ name: string; seconds: number }[]
+	>([]);
 
 	const calculateTime = () => {
 		if (!startTime || !endTime) return '시간 정보 없음';
@@ -25,34 +27,37 @@ export default function FinishPage() {
 
 	useEffect(() => {
 		const updateRedis = async () => {
-			// 룸정보를  업데이트함.
-			const playerName = useGameStore.getState().playerName;
-			const host = useGameStore.getState().host;
-			const userAgent = useGameStore.getState().userAgent;
-			const platform = useGameStore.getState().platform;
-			const now = new Date().toISOString();
+			const playerName = localStorage.getItem('playerName');
 
 			const data = {
 				name: `escape_${playerName}`,
-				host,
-				userAgent,
-				platform,
-				now,
-				roomId: 10,
+				host: localStorage.getItem('userHost'),
+				userAgent: localStorage.getItem('userAgent'),
+				platform: localStorage.getItem('userPlatform'),
+				now: new Date().toISOString(),
+				roomId: 'finish',
 				seconds: calculateSeconds(),
 			};
 
-			await fetch(
-				`https://api.sosohappy.synology.me/v1/redis/${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
+			fetch(
+				`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
 				{
 					method: 'POST',
 				},
 			);
 
-			// const topUser = await fetch(
-			// 	`https://api.sosohappy.synology.me/v1/redis/;
-		};
+			const topUser = await fetch(
+				`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/search/escape_`,
+			);
+			const topUserJson = await topUser.json();
+			const parsedTopUser = topUserJson.result;
 
+			const filteredTopUser = Object.values(parsedTopUser).map(item =>
+				JSON.parse(item as string),
+			);
+
+			setTopUsers(filteredTopUser);
+		};
 		updateRedis();
 	}, []);
 
@@ -78,6 +83,33 @@ export default function FinishPage() {
 							총 소요 시간: {calculateTime()}
 						</p>
 					</div>
+					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner">
+						<h2 className="text-2xl font-bold text-orange-800 mb-4">
+							🏆 TOP 5
+						</h2>
+						<div className="space-y-3">
+							{topUsers.map((user, index) => (
+								<div
+									key={index}
+									className="flex items-center justify-between bg-white/80 p-3 rounded-lg"
+								>
+									<div className="flex items-center gap-2">
+										<span className="font-bold text-orange-600 w-8">
+											{index + 1}위
+										</span>
+										<span className="font-medium">
+											{user.name.replace('escape_', '')}
+										</span>
+									</div>
+									<span className="text-gray-600">
+										{Math.floor(user.seconds / 60)}분{' '}
+										{user.seconds % 60}초
+									</span>
+								</div>
+							))}
+						</div>
+					</div>
+
 					<Link
 						href="/"
 						className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"

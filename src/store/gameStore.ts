@@ -8,9 +8,6 @@ interface GameStore extends GameState {
 	consumeHint: () => void;
 	completeRoom: (roomId: number) => void;
 	setPlayerName: (name: string) => void;
-	setHost: (host: string) => void;
-	setUserAgent: (userAgent: string) => void;
-	setPlatform: (platform: string) => void;
 }
 
 // @ts-expect-error - Complex type inference with zustand devtools
@@ -30,6 +27,10 @@ const store = set => ({
 		const host = await getIpAddress();
 		const browserInfo = await getBrowserInfo();
 
+		localStorage.setItem('userHost', host.toString());
+		localStorage.setItem('userAgent', browserInfo.userAgent);
+		localStorage.setItem('userPlatform', browserInfo.platform);
+
 		set({
 			currentRoom: 1,
 			hintsRemaining: 3,
@@ -41,21 +42,6 @@ const store = set => ({
 			userAgent: browserInfo.userAgent,
 			platform: browserInfo.platform,
 		});
-	},
-
-	setHost: (host: string) => {
-		localStorage.setItem('userHost', host.toString());
-		set({ host });
-	},
-
-	setUserAgent: (userAgent: string) => {
-		localStorage.setItem('userAgent', userAgent.toString());
-		set({ userAgent });
-	},
-
-	setPlatform: (platform: string) => {
-		localStorage.setItem('userPlatform', platform.toString());
-		set({ platform });
 	},
 
 	setCurrentRoom: (roomId: number) => {
