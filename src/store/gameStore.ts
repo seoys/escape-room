@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { GameState } from '@/types/room';
 
 interface GameStore extends GameState {

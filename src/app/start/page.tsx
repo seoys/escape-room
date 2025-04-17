@@ -25,7 +25,7 @@ export default function StartPage() {
 		}
 
 		const userData = await fetch(
-			`https://api.sosohappy.synology.me/v1/redis/search/escape_${name}`,
+			`https://api.sosohappy.synology.me/v1/redis/escape_${name}`,
 		);
 
 		const userDataJson = await userData.json();
