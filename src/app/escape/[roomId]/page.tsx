@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useGameStore } from '@/store/gameStore';
 import { rooms } from '@/lib/rooms';
@@ -23,6 +23,7 @@ export default function RoomPage() {
 		setCurrentRoom,
 	} = useGameStore();
 
+	const answerInputRef = useRef<HTMLInputElement>(null);
 	const [answer, setAnswer] = useState('');
 	const [showHint, setShowHint] = useState(false);
 	const [error, setError] = useState('');
@@ -34,6 +35,12 @@ export default function RoomPage() {
 			setCurrentRoom(parseInt(savedRoom));
 		}
 	}, []);
+
+	useEffect(() => {
+		if (!isLoading && answerInputRef.current) {
+			answerInputRef.current.focus();
+		}
+	}, [isLoading]);
 
 	useEffect(() => {
 		const loadRoom = async () => {
@@ -180,6 +187,7 @@ export default function RoomPage() {
 					>
 						<div className="relative">
 							<input
+								ref={answerInputRef}
 								type="text"
 								value={answer}
 								onChange={e => setAnswer(e.target.value)}

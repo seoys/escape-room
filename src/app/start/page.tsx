@@ -1,14 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
 
 export default function StartPage() {
+	const answerInputRef = useRef<HTMLInputElement>(null);
 	const [name, setName] = useState('');
+	const [isLoading, setIsLoading] = useState(true);
 	const router = useRouter();
 	const { setCurrentRoom } = useGameStore();
+
+	useEffect(() => {
+		if (!isLoading && answerInputRef.current) {
+			answerInputRef.current.focus();
+		}
+	}, [isLoading]);
 
 	const handleStart = async () => {
 		if (!name.trim()) {
@@ -79,6 +87,10 @@ export default function StartPage() {
 		// useGameStore.getState().setPlatform(browserInfo.platform);
 	};
 
+	useEffect(() => {
+		setIsLoading(false);
+	}, []);
+
 	return (
 		<main className="min-h-screen flex items-center justify-center relative overflow-hidden">
 			<Image
@@ -97,6 +109,7 @@ export default function StartPage() {
 						type="text"
 						value={name}
 						onChange={e => setName(e.target.value)}
+						ref={answerInputRef}
 						placeholder="이름 입력"
 						className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
 					/>
