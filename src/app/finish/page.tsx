@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 export default function FinishPage() {
 	const { startTime, endTime } = useGameStore();
-	const playerName = localStorage.getItem('playerName');
+	const [playerName, setPlayerName] = useState('');
 	const [topUsers, setTopUsers] = useState<
 		{ name: string; seconds: number }[]
 	>([]);
@@ -33,6 +33,8 @@ export default function FinishPage() {
 
 			setTopUsers(filteredTopUser);
 		};
+
+		setPlayerName(localStorage.getItem('playerName') as string);
 
 		fetchTopUsers();
 	}, []);
