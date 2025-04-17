@@ -27,17 +27,7 @@ export default function RoomPage() {
 	const [showHint, setShowHint] = useState(false);
 	const [error, setError] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
-
-	// 룸정보를  업데이트함.
-	const playerName = useGameStore.getState().playerName;
-	const host = useGameStore.getState().host;
-	const userAgent = useGameStore.getState().userAgent;
-	const language = useGameStore.getState().language;
-	const platform = useGameStore.getState().platform;
-	const screenWidth = useGameStore.getState().screenWidth;
-	const screenHeight = useGameStore.getState().screenHeight;
-	const timeZone = useGameStore.getState().timeZone;
-	const now = new Date().toISOString();
+	const [playerName, setPlayerName] = useState('');
 
 	useEffect(() => {
 		const savedRoom = localStorage.getItem('currentRoom');
@@ -55,21 +45,23 @@ export default function RoomPage() {
 					return;
 				}
 
+				setPlayerName(useGameStore.getState().playerName);
+				const userHost = localStorage.getItem('userHost');
+				const userAgent = localStorage.getItem('userAgent');
+				const userPlatform = localStorage.getItem('userPlatform');
+				const now = new Date().toISOString();
+
 				const data = {
 					name: `escape_${playerName}`,
-					host,
+					host: userHost,
 					userAgent,
-					language,
-					platform,
-					screenWidth,
-					screenHeight,
-					timeZone,
+					platform: userPlatform,
 					now,
 					roomId,
 				};
 
 				fetch(
-					`https://api.sosohappy.synology.me/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
+					`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
 					{
 						method: 'POST',
 					},
@@ -170,16 +162,16 @@ export default function RoomPage() {
 								value={answer}
 								onChange={e => setAnswer(e.target.value)}
 								placeholder="정답을 입력하세요"
-								className="w-full h-17 md:h-48 px-4 md:px-8 bg-gray-900/70 rounded-2xl 
-                          text-base md:text-lg text-center text-white placeholder-gray-500 
-                          border-4 border-yellow-900/50 
-                          focus:border-yellow-600/50 focus:outline-none 
-                          transition-all duration-300
-                          shadow-[inset_0_4px_8px_rgba(0,0,0,0.6)]
-                          focus:shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),0_0_30px_rgba(234,179,8,0.2)]
-                          tracking-wider
-                          bg-[url('/images/old-paper-texture.png')] bg-cover bg-center bg-blend-multiply
-                          hover:bg-gray-800/70"
+								className="w-full h-17 md:h-48 px-4 md:px-8 bg-gray-900/70 rounded-2xl
+		                  text-base md:text-lg text-center text-white placeholder-gray-500
+		                  border-4 border-yellow-900/50
+		                  focus:border-yellow-600/50 focus:outline-none
+		                  transition-all duration-300
+		                  shadow-[inset_0_4px_8px_rgba(0,0,0,0.6)]
+		                  focus:shadow-[inset_0_4px_8px_rgba(0,0,0,0.6),0_0_30px_rgba(234,179,8,0.2)]
+		                  tracking-wider
+		                  bg-[url('/images/old-paper-texture.png')] bg-cover bg-center bg-blend-multiply
+		                  hover:bg-gray-800/70"
 							/>
 						</div>
 						<div className="flex flex-col gap-3 md:gap-4">
@@ -187,14 +179,14 @@ export default function RoomPage() {
 								<button
 									type="submit"
 									className="h-10 md:h-12 flex-1
-                          bg-gradient-to-br from-green-500/90 to-green-700/90
-                          hover:from-green-400/90 hover:to-green-600/90
-                          rounded-xl text-base md:text-lg font-bold text-white tracking-wider
-                          transition-all duration-200 ease-out
-                          hover:scale-[1.01] active:scale-[0.99]
-                          border border-green-400/20
-                          shadow-lg shadow-green-900/30
-                          backdrop-blur-sm"
+		                  bg-gradient-to-br from-green-500/90 to-green-700/90
+		                  hover:from-green-400/90 hover:to-green-600/90
+		                  rounded-xl text-base md:text-lg font-bold text-white tracking-wider
+		                  transition-all duration-200 ease-out
+		                  hover:scale-[1.01] active:scale-[0.99]
+		                  border border-green-400/20
+		                  shadow-lg shadow-green-900/30
+		                  backdrop-blur-sm"
 								>
 									제출하기
 								</button>
@@ -203,8 +195,8 @@ export default function RoomPage() {
 									onClick={handleHint}
 									disabled={hintsRemaining === 0 || showHint}
 									className={`h-10 md:h-12 flex-1 rounded-xl text-base md:text-lg font-bold tracking-wide
-                          transition-all duration-200 ease-out backdrop-blur-sm
-                          ${
+		                  transition-all duration-200 ease-out backdrop-blur-sm
+		                  ${
 								hintsRemaining > 0 && !showHint
 									? 'bg-gradient-to-br from-amber-500/90 to-amber-700/90 hover:from-amber-400/90 hover:to-amber-600/90 text-white border border-amber-400/20 shadow-lg shadow-amber-900/30 hover:scale-[1.01] active:scale-[0.99]'
 									: 'bg-gray-700/60 text-gray-400 border border-gray-600/30 cursor-not-allowed'
@@ -218,14 +210,14 @@ export default function RoomPage() {
 									type="button"
 									onClick={handleBack}
 									className="h-10 md:h-12 flex-1
-                          bg-gradient-to-br from-gray-600/90 to-gray-800/90
-                          hover:from-gray-500/90 hover:to-gray-700/90
-                          rounded-xl text-base md:text-lg font-bold text-white tracking-wider
-                          transition-all duration-200 ease-out
-                          hover:scale-[1.01] active:scale-[0.99]
-                          border border-gray-400/20
-                          shadow-lg shadow-gray-900/30
-                          backdrop-blur-sm"
+		                  bg-gradient-to-br from-gray-600/90 to-gray-800/90
+		                  hover:from-gray-500/90 hover:to-gray-700/90
+		                  rounded-xl text-base md:text-lg font-bold text-white tracking-wider
+		                  transition-all duration-200 ease-out
+		                  hover:scale-[1.01] active:scale-[0.99]
+		                  border border-gray-400/20
+		                  shadow-lg shadow-gray-900/30
+		                  backdrop-blur-sm"
 								>
 									뒤로가기
 								</button>
@@ -233,14 +225,14 @@ export default function RoomPage() {
 									type="button"
 									onClick={() => router.push('/')}
 									className="h-10 md:h-12 flex-1
-                          bg-gradient-to-br from-red-500/90 to-red-700/90
-                          hover:from-red-400/90 hover:to-red-600/90
-                          rounded-xl text-base md:text-lg font-bold text-white tracking-wider
-                          transition-all duration-200 ease-out
-                          hover:scale-[1.01] active:scale-[0.99]
-                          border border-red-400/20
-                          shadow-lg shadow-red-900/30
-                          backdrop-blur-sm"
+		                  bg-gradient-to-br from-red-500/90 to-red-700/90
+		                  hover:from-red-400/90 hover:to-red-600/90
+		                  rounded-xl text-base md:text-lg font-bold text-white tracking-wider
+		                  transition-all duration-200 ease-out
+		                  hover:scale-[1.01] active:scale-[0.99]
+		                  border border-red-400/20
+		                  shadow-lg shadow-red-900/30
+		                  backdrop-blur-sm"
 								>
 									메인으로
 								</button>

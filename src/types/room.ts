@@ -17,9 +17,5 @@ export interface GameState {
 	endTime?: Date;
 	host: string;
 	userAgent: string;
-	language: string;
 	platform: string;
-	screenWidth: number;
-	screenHeight: number;
-	timeZone: string;
 }

@@ -1,47 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
+import { getBrowserInfo, getIpAddress } from '@/lib/utils/userInfo';
+
 export default function StartPage() {
 	const [name, setName] = useState('');
+	const [browserInfo, setBrowserInfo] = useState({});
+	const [ipAddress, setIpAddress] = useState('');
+
 	const router = useRouter();
 
-	const handleStart = async () => {
-		const host: string = window.location.hostname;
-		const userAgent: string = window.navigator.userAgent;
-		const language: string = window.navigator.language;
-		const platform: string = window.navigator.platform;
-		const screenWidth: number = window.screen.width;
-		const screenHeight: number = window.screen.height;
-		const timeZone: string =
-			Intl.DateTimeFormat().resolvedOptions().timeZone;
-		const now: string = new Date().toISOString();
+	useEffect(() => {
+		userInfo();
+	}, []);
 
-		if (!name.trim()) {
-			alert('이름을 입력해주세요.');
-			return;
-		}
+	const userInfo = async () => {
+		const browserInfo = await getBrowserInfo();
+		const ipAddress = await getIpAddress();
+
+		setBrowserInfo(browserInfo);
+		setIpAddress(ipAddress);
+	};
+
+	const handleStart = async () => {
+		// if (!name.trim()) {
+		// 	alert('이름을 입력해주세요.');
+		// 	return;
+		// }
+
+		const data = {
+			name: `escape_${name}`,
+			host: ipAddress,
+			userAgent: browserInfo.userAgent,
+			platform: browserInfo.platform,
+			now: new Date().toISOString(),
+			roomId: 1,
+		};
+
+		console.log(data);
 
 		const userData = await fetch(
-			`https://api.sosohappy.synology.me/v1/redis/escape_${name}`,
+			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}`,
 		);
-
 		const userDataJson = await userData.json();
 
-		if (userDataJson.result.data) {
+		if (userDataJson.result) {
 			const userInfo = JSON.parse(userDataJson.result);
 
 			if (
 				userInfo.name == name ||
-				userInfo.host == host ||
-				userInfo.userAgent == userAgent ||
-				userInfo.language == language ||
-				userInfo.platform == platform ||
-				userInfo.screenWidth == screenWidth ||
-				userInfo.screenHeight == screenHeight ||
-				userInfo.timeZone == timeZone
+				userInfo.host == ipAddress ||
+				userInfo.userAgent == browserInfo.userAgent ||
+				userInfo.platform == browserInfo.platform
 			) {
 				alert(
 					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
@@ -53,21 +66,8 @@ export default function StartPage() {
 			}
 		}
 
-		const data = {
-			name: `escape_${name}`,
-			host,
-			userAgent,
-			language,
-			platform,
-			screenWidth,
-			screenHeight,
-			timeZone,
-			now,
-			roomId: 1,
-		};
-
 		await fetch(
-			`https://api.sosohappy.synology.me/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
+			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
 			{
 				method: 'POST',
 			},
@@ -76,13 +76,9 @@ export default function StartPage() {
 		// 추후 전역 상태 저장도 가능
 		// 예: useGameStore.getState().setPlayerName(name);
 		useGameStore.getState().setPlayerName(name);
-		useGameStore.getState().setHost(host);
-		useGameStore.getState().setUserAgent(userAgent);
-		useGameStore.getState().setLanguage(language);
-		useGameStore.getState().setPlatform(platform);
-		useGameStore.getState().setScreenWidth(screenWidth);
-		useGameStore.getState().setScreenHeight(screenHeight);
-		useGameStore.getState().setTimeZone(timeZone);
+		useGameStore.getState().setHost(ipAddress);
+		useGameStore.getState().setUserAgent(browserInfo.userAgent);
+		useGameStore.getState().setPlatform(browserInfo.platform);
 
 		router.push('/escape/1'); // 다음 페이지 경로
 	};

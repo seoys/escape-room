@@ -10,14 +10,11 @@ interface GameStore extends GameState {
 	setPlayerName: (name: string) => void;
 	setHost: (host: string) => void;
 	setUserAgent: (userAgent: string) => void;
-	setLanguage: (language: string) => void;
 	setPlatform: (platform: string) => void;
-	setScreenWidth: (screenWidth: number) => void;
-	setScreenHeight: (screenHeight: number) => void;
-	setTimeZone: (timeZone: string) => void;
 }
 
-export const useGameStore = create<GameStore>(set => ({
+// @ts-expect-error - Complex type inference with zustand devtools
+const store = set => ({
 	currentRoom: 1,
 	hintsRemaining: 3,
 	completedRooms: [],
@@ -26,11 +23,7 @@ export const useGameStore = create<GameStore>(set => ({
 	playerName: '',
 	host: '',
 	userAgent: '',
-	language: '',
 	platform: '',
-	screenWidth: 0,
-	screenHeight: 0,
-	timeZone: '',
 
 	initGame: () => {
 		localStorage.removeItem('currentRoom');
@@ -41,55 +34,52 @@ export const useGameStore = create<GameStore>(set => ({
 			startTime: new Date(),
 			endTime: undefined,
 			playerName: '',
+			host: '',
+			userAgent: '',
+			platform: '',
 		});
 	},
 
-	setHost: host => {
+	setHost: (host: string) => {
+		localStorage.setItem('userHost', host.toString());
 		set({ host });
 	},
 
-	setUserAgent: userAgent => {
+	setUserAgent: (userAgent: string) => {
+		localStorage.setItem('userAgent', userAgent.toString());
 		set({ userAgent });
 	},
 
-	setLanguage: language => {
-		set({ language });
-	},
-
-	setPlatform: platform => {
+	setPlatform: (platform: string) => {
+		localStorage.setItem('userPlatform', platform.toString());
 		set({ platform });
 	},
 
-	setScreenWidth: screenWidth => {
-		set({ screenWidth });
-	},
-
-	setScreenHeight: screenHeight => {
-		set({ screenHeight });
-	},
-
-	setTimeZone: timeZone => {
-		set({ timeZone });
-	},
-
-	setCurrentRoom: roomId => {
+	setCurrentRoom: (roomId: number) => {
 		localStorage.setItem('currentRoom', roomId.toString());
 		set({ currentRoom: roomId });
 	},
 
-	setPlayerName: name => {
+	setPlayerName: (name: string) => {
+		localStorage.setItem('playerName', name.toString());
 		set({ playerName: name });
 	},
 
 	consumeHint: () =>
-		set(state => ({
+		set((state: GameStore) => ({
 			hintsRemaining: Math.max(0, state.hintsRemaining - 1),
 		})),
 
-	completeRoom: roomId =>
-		set(state => {
+	completeRoom: (roomId: number) =>
+		set((state: GameStore) => {
 			const completedRooms = [...state.completedRooms, roomId];
 			const endTime = roomId === 10 ? new Date() : state.endTime;
 			return { completedRooms, endTime };
 		}),
-}));
+});
+
+export const useGameStore = create<GameStore>()(
+	process.env.NODE_ENV !== 'production'
+		? devtools(store, { name: 'game-store' })
+		: store,
+);
