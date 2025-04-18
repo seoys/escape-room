@@ -80,7 +80,6 @@ export default function FinishPage() {
 											{index === 1 && '🥈'}
 											{index === 2 && '🥉'}
 											{index > 2 && '🎖️'}
-											{index + 1}위
 										</span>
 										<span className="font-medium">
 											{user.name.replace('escape_', '')}
