@@ -27,9 +27,13 @@ export default function FinishPage() {
 			const topUserJson = await topUser.json();
 			const parsedTopUser = topUserJson.result;
 
-			const filteredTopUser = Object.values(parsedTopUser).map(item =>
-				JSON.parse(item as string),
-			);
+			const filteredTopUser = Object.values(parsedTopUser)
+				.map(item => JSON.parse(item as string))
+				.sort(
+					(a: { seconds: number }, b: { seconds: number }) =>
+						a.seconds - b.seconds,
+				)
+				.slice(0, 5);
 
 			setTopUsers(filteredTopUser);
 		};
