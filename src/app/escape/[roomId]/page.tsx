@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useGameStore } from '@/store/gameStore';
 import { rooms } from '@/lib/rooms';
 import { Black_Han_Sans } from 'next/font/google';
+import Image from 'next/image';
 
 const blackHanSans = Black_Han_Sans({
 	weight: '400',
@@ -143,7 +144,7 @@ export default function RoomPage() {
 	};
 
 	return (
-		<div className="min-h-screen w-full relative overflow-y-scroll">
+		<div className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-300">
 			<div
 				style={{
 					position: 'fixed',
@@ -170,19 +171,23 @@ export default function RoomPage() {
 						</p>
 						{roomId === 10 && (
 							<div className="mt-8 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/30">
-								<img
+								<Image
 									src="/images/escape_room_11.webp"
 									alt="밀레"
 									className="w-full max-w-2xl mx-auto"
+									width={1000}
+									height={1000}
 								/>
 							</div>
 						)}
 						{roomId === 12 && (
 							<div className="mt-8 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/30">
-								<img
+								<Image
 									src="/images/youtube.gif"
 									alt="개와 닭"
 									className="w-full max-w-2xl mx-auto"
+									width={1000}
+									height={1000}
 								/>
 							</div>
 						)}
