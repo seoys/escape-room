@@ -171,7 +171,7 @@ export default function RoomPage() {
 						{roomId === 10 && (
 							<div className="mt-8 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/30">
 								<img
-									src="/images/escape_room_11.png"
+									src="/images/escape_room_11.webp"
 									alt="밀레"
 									className="w-full max-w-2xl mx-auto"
 								/>
