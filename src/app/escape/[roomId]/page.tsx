@@ -143,7 +143,7 @@ export default function RoomPage() {
 	};
 
 	return (
-		<div className="min-h-screen w-full relative">
+		<div className="min-h-screen w-full relative overflow-y-auto">
 			<div
 				style={{
 					position: 'fixed',
