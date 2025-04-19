@@ -29,6 +29,10 @@ export default function FinishPage() {
 
 			const filteredTopUser = Object.values(parsedTopUser)
 				.map(item => JSON.parse(item as string))
+				.filter(
+					(item: { seconds: number }) =>
+						item.seconds !== undefined && item.seconds !== null,
+				)
 				.sort(
 					(a: { seconds: number }, b: { seconds: number }) =>
 						a.seconds - b.seconds,
