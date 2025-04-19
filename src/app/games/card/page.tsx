@@ -21,7 +21,7 @@ export default function CardGamePage() {
 		setFlipped(Array(shuffled.length).fill(true)); // 처음에는 모든 카드가 뒷면
 	}, []);
 
-	const handleCardClick = (index: number) => {
+	const handleCardClick = () => {
 		const newFlipped = [...flipped];
 		// newFlipped[index] = !newFlipped[index]; // 클릭할 때마다 앞/뒷면 토글
 		setFlipped(newFlipped);
