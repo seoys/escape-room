@@ -94,7 +94,7 @@ export default function RoomPage() {
 		e.preventDefault();
 		if (answer.toLowerCase() === room.answer.toLowerCase()) {
 			completeRoom(roomId);
-			if (roomId === 10) {
+			if (roomId === 12) {
 				const playerName = localStorage.getItem('playerName');
 
 				const data = {
@@ -143,7 +143,7 @@ export default function RoomPage() {
 	};
 
 	return (
-		<div className="min-h-screen w-full relative overflow-y-auto">
+		<div className="min-h-screen w-full relative overflow-y-scroll">
 			<div
 				style={{
 					position: 'fixed',
@@ -168,6 +168,24 @@ export default function RoomPage() {
 						<p className="text-base md:text-lg text-center font-medium tracking-wide leading-relaxed whitespace-pre-wrap text-white">
 							❓{room.question}
 						</p>
+						{roomId === 10 && (
+							<div className="mt-8 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/30">
+								<img
+									src="/images/escape_room_11.png"
+									alt="밀레"
+									className="w-full max-w-2xl mx-auto"
+								/>
+							</div>
+						)}
+						{roomId === 12 && (
+							<div className="mt-8 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/30">
+								<img
+									src="/images/youtube.gif"
+									alt="개와 닭"
+									className="w-full max-w-2xl mx-auto"
+								/>
+							</div>
+						)}
 					</div>
 					{showHint && (
 						<div className="bg-amber-900/40 p-4 md:p-6 rounded-2xl mb-4 md:mb-6 border-2 border-amber-400/30">
