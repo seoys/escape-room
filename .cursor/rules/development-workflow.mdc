@@ -1,0 +1,41 @@
+---
+description: Development workflow and deployment guidelines
+---
+
+# Development Workflow & Deployment
+
+## Environment Setup
+
+- Requires Node.js 22+ (specified in [package.json](mdc:package.json))
+- Use pnpm as package manager (`corepack enable` to enable)
+- Environment variables: `NEXT_PUBLIC_API_URL` for Redis API gateway
+
+## Development Commands
+
+- `pnpm dev` - Start development server with Turbopack
+- `pnpm build` - Create production build
+- `pnpm start -- -p 10050` - Serve production build on port 10050
+- `pnpm lint` - Run ESLint checks
+- `pnpm format` - Apply Prettier formatting
+- `pnpm format:check` - Verify Prettier formatting
+
+## PM2 Deployment
+
+- PM2 ecosystem config in [eco.config.js](mdc:eco.config.js)
+- Commands: `pm2:start`, `pm2:stop`, `pm2:restart`, `pm2:delete`, `pm2:logs`, `pm2:monit`
+- Production deployment: `pnpm pm2:start` (includes git pull, build, and PM2 start)
+
+## Testing & Quality Assurance
+
+- No formal test suite yet - manual QA required
+- Document manual testing steps in PRs
+- Future tests should use React Testing Library/Playwright
+- Test files should follow `*.test.tsx` pattern in `src/**/__tests__/`
+
+## Git & Commit Guidelines
+
+- Follow `type: summary` commit message format
+- Types: feat, fix, refactor, chore, docs, style, perf, test, build
+- Keep commit messages concise and imperative
+- Pull requests should include screenshots for UI changes
+- Reference spec sections or issues in PRs

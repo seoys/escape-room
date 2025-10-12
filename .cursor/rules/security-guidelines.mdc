@@ -1,0 +1,47 @@
+---
+description: Security best practices for the escape room game
+---
+
+# Security Guidelines for Escape Room Game
+
+## Input Validation & Sanitization
+
+- Validate all user inputs on both client and server side
+- Sanitize puzzle answers before comparison (case-sensitive matching)
+- Prevent XSS attacks by properly escaping user-generated content
+- Validate room IDs to prevent unauthorized access to rooms
+
+## Session Security
+
+- Store sensitive session data in secure HTTP-only cookies when possible
+- Use localStorage for non-sensitive game state only
+- Implement proper session timeout mechanisms
+- Validate player progression to prevent room skipping
+
+## API Security
+
+- Use HTTPS for all API communications
+- Implement rate limiting for API endpoints
+- Validate API responses before processing
+- Use environment variables for sensitive configuration (NEXT_PUBLIC_API_URL)
+
+## Data Protection
+
+- Hash or encrypt sensitive player data in Redis
+- Implement proper CORS policies
+- Use Content Security Policy (CSP) headers
+- Sanitize error messages to prevent information disclosure
+
+## Game Logic Security
+
+- Server-side validation of puzzle answers
+- Prevent client-side manipulation of game state
+- Implement anti-cheat measures for leaderboard
+- Validate hint usage and room completion status
+
+## File Upload Security (if applicable)
+
+- Validate file types and sizes for any image uploads
+- Scan uploaded files for malware
+- Store uploaded files outside web root
+- Use secure file naming conventions

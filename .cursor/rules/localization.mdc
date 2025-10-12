@@ -1,0 +1,38 @@
+---
+description: Korean language and localization guidelines
+---
+
+# Korean Localization Guidelines
+
+## Language & Text
+
+- All user-facing text should be in Korean
+- Use formal/polite Korean (존댓말) for game instructions and UI
+- Puzzle content can use casual Korean (반말) for character dialogue
+- Maintain consistent terminology across all game elements
+
+## Typography & Fonts
+
+- Primary font: Gaegu (Google Fonts) as defined in [src/app/layout.tsx](mdc:src/app/layout.tsx)
+- Font weights: 300 (light), 400 (regular), 700 (bold)
+- Ensure proper Korean character rendering and spacing
+
+## Content Guidelines
+
+- Puzzle questions should be clear and unambiguous in Korean
+- Hints should provide helpful guidance without giving away answers
+- Error messages and feedback should be user-friendly in Korean
+- Room titles should be engaging and descriptive
+
+## Cultural Considerations
+
+- Use Korean cultural references appropriately in puzzles
+- Consider Korean educational standards for difficulty levels
+- Ensure content is appropriate for the target age group (elementary school level)
+
+## Technical Implementation
+
+- HTML lang attribute set to "ko" in root layout
+- Use proper Korean text encoding (UTF-8)
+- Consider Korean text length in UI design (Korean text can be longer than English)
+- Test Korean text rendering across different devices and browsers

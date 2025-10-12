@@ -1,0 +1,41 @@
+---
+description: Game logic and puzzle system rules
+---
+
+# Escape Room Game Logic Rules
+
+## Game Flow & Progression
+
+- Players start at room 1 and progress sequentially through rooms 1-12
+- Each room must be completed before accessing the next
+- Game state is managed in [src/store/gameStore.ts](mdc:src/store/gameStore.ts)
+- Progress is persisted to localStorage for session recovery
+
+## Hint System
+
+- Total of 3 hints available across all rooms (shared pool)
+- Hints are consumed immediately when used
+- Hint count is tracked in global game state
+- Each room has a specific hint defined in [src/lib/rooms.ts](mdc:src/lib/rooms.ts)
+
+## Room Data Structure
+
+- Room definitions in [src/lib/rooms.ts](mdc:src/lib/rooms.ts) follow the Room interface from [src/types/room.ts](mdc:src/types/room.ts)
+- Each room has: id, title, question, answer, hint, type, difficulty
+- Difficulty ranges from 3-10 as specified in [spec.md](mdc:spec.md)
+- Answers are case-sensitive strings
+
+## Puzzle Types & Implementation
+
+- Pattern recognition (rooms 1, 8)
+- Logic puzzles (rooms 2, 4, 5, 6, 9, 11)
+- Time-based puzzles (room 3)
+- Mathematical puzzles (rooms 7, 11)
+- Visual puzzles (rooms 10, 12)
+- Card-based puzzles (separate game in [src/app/games/card/](mdc:src/app/games/card/))
+
+## Session Management
+
+- Player sessions include: name, start/end time, browser info, IP
+- Redis integration for leaderboard and analytics (via NEXT_PUBLIC_API_URL)
+- Automatic logging on room entry/exit for analytics
