@@ -33,16 +33,7 @@ export default function StartPage() {
 		if (userDataJson.result) {
 			const userInfo = JSON.parse(userDataJson.result);
 
-			if (
-				userInfo.name == name ||
-				userInfo.host == host ||
-				userInfo.userAgent == userAgent ||
-				userInfo.language == language ||
-				userInfo.platform == platform ||
-				userInfo.screenWidth == screenWidth ||
-				userInfo.screenHeight == screenHeight ||
-				userInfo.timeZone == timeZone
-			) {
+			if (userInfo.name == `escape_${name}`) {
 				alert(
 					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
 				);
@@ -64,12 +55,28 @@ export default function StartPage() {
 			roomId: 1,
 		};
 
-		fetch(
-			`https://api.sosohappy.synology.me/v1/redis/${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
-			{
-				method: 'POST',
-			},
-		);
+		try {
+			const response = await fetch(
+				`https://api.sosohappy.synology.me/v1/redis/escape_${name}`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(data),
+				},
+			);
+
+			if (!response.ok) {
+				console.error('Failed to save user data:', response.statusText);
+				alert('데이터 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+				return;
+			}
+		} catch (error) {
+			console.error('Failed to save user data:', error);
+			alert('데이터 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+			return;
+		}
 
 		// 추후 전역 상태 저장도 가능
 		// 예: useGameStore.getState().setPlayerName(name);
