@@ -1,0 +1,47 @@
+---
+alwaysApply: true
+---
+
+## Pull Request 생성
+
+이 문서는 모든 PR에서 자동 초안을 일관되게 생성하기 위한 절차입니다. `{{placeholder}}`는 실행 전 실제 값으로 치환합니다.
+
+### 사전 점검
+
+1. **이슈 확인**
+    - 변경이 특정 이슈와 연결되어야 합니다. 없다면 "연관된 이슈 링크가 있나요?"라고 물어보고 응답을 저장합니다.
+    - `{{issue_link}}`에는 `#123` 또는 URL을 그대로 사용합니다. 이슈가 없다면 `N/A`를 입력합니다.
+2. **대상 브랜치 확인**
+    - 별도 지시가 없다면 병합 대상은 `main`입니다.
+    - `git fetch origin main` 후 `git rebase origin/main` 또는 `git merge origin/main`으로 최신 상태를 유지합니다.
+3. **변경 사항 정리**
+    - `git status -sb`로 커밋되지 않은 파일이 없는지 확인합니다.
+    - `git diff origin/main...HEAD --stat`으로 대략적인 영향 범위를 파악합니다.
+    - 주요 변경 요약을 `{{changes}}` 변수에 1~3줄 bullet로 정리합니다. (예: `- README에 프로젝트 구조 설명 추가`)
+4. **품질 확인**
+    - 요구된 테스트/빌드/린트 명령을 실행하고 성공 여부를 기록합니다. 결과를 `{{verification}}` 변수에 기입합니다. (예: `- pnpm lint ✅`)
+
+### 초안 PR 생성 스크립트
+
+```
+git push origin HEAD && \
+cat <<'EOF' | envsubst | gh pr create \
+  --draft \
+  --title "업데이트 {{feature}}" \
+  --body-file -
+## 개요
+{{changes}}
+
+## 검증
+{{verification}}
+
+## 관련 이슈
+{{issue_link}}
+EOF
+```
+
+### 마무리
+
+1. `gh pr view --web`으로 초안이 올바르게 생성되었는지 확인하고, 템플릿 섹션이 비어 있지 않은지 다시 읽습니다.
+2. 자동 생성 후 추가 스크린샷이나 체크리스트가 필요하면 GitHub 웹 UI에서 보충합니다.
+3. 리뷰어가 이해하기 쉽도록 PR 제목(`업데이트 {{feature}}`)의 `{{feature}}`는 핵심 변경을 한 단어(예: `docs`, `rooms`, `api`)로 표현합니다.
