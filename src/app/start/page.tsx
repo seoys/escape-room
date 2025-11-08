@@ -35,7 +35,7 @@ export default function StartPage() {
 
 			if (userInfo.name == `escape_${name}`) {
 				alert(
-					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
+					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다. :)',
 				);
 				router.push(`/escape/${userInfo.roomId}`);
 				return;
