@@ -1,22 +1,17 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { GameState } from '@/types/room';
-
+import { getBrowserInfo, getIpAddress } from '@/lib/utils/userInfo';
 interface GameStore extends GameState {
-	initGame: () => void;
+	initGame: () => Promise<void>;
 	setCurrentRoom: (roomId: number) => void;
 	consumeHint: () => void;
 	completeRoom: (roomId: number) => void;
 	setPlayerName: (name: string) => void;
-	setHost: (host: string) => void;
-	setUserAgent: (userAgent: string) => void;
-	setLanguage: (language: string) => void;
-	setPlatform: (platform: string) => void;
-	setScreenWidth: (screenWidth: number) => void;
-	setScreenHeight: (screenHeight: number) => void;
-	setTimeZone: (timeZone: string) => void;
 }
 
-export const useGameStore = create<GameStore>(set => ({
+// @ts-expect-error - Complex type inference with zustand devtools
+const store = set => ({
 	currentRoom: 1,
 	hintsRemaining: 3,
 	completedRooms: [],
@@ -25,14 +20,17 @@ export const useGameStore = create<GameStore>(set => ({
 	playerName: '',
 	host: '',
 	userAgent: '',
-	language: '',
 	platform: '',
-	screenWidth: 0,
-	screenHeight: 0,
-	timeZone: '',
 
-	initGame: () => {
+	initGame: async () => {
 		localStorage.removeItem('currentRoom');
+		const host = await getIpAddress();
+		const browserInfo = await getBrowserInfo();
+
+		localStorage.setItem('userHost', host.toString());
+		localStorage.setItem('userAgent', browserInfo.userAgent);
+		localStorage.setItem('userPlatform', browserInfo.platform);
+		localStorage.setItem('startTime', new Date().toISOString());
 		set({
 			currentRoom: 1,
 			hintsRemaining: 3,
@@ -40,55 +38,37 @@ export const useGameStore = create<GameStore>(set => ({
 			startTime: new Date(),
 			endTime: undefined,
 			playerName: '',
+			host: host,
+			userAgent: browserInfo.userAgent,
+			platform: browserInfo.platform,
 		});
 	},
 
-	setHost: host => {
-		set({ host });
-	},
-
-	setUserAgent: userAgent => {
-		set({ userAgent });
-	},
-
-	setLanguage: language => {
-		set({ language });
-	},
-
-	setPlatform: platform => {
-		set({ platform });
-	},
-
-	setScreenWidth: screenWidth => {
-		set({ screenWidth });
-	},
-
-	setScreenHeight: screenHeight => {
-		set({ screenHeight });
-	},
-
-	setTimeZone: timeZone => {
-		set({ timeZone });
-	},
-
-	setCurrentRoom: roomId => {
+	setCurrentRoom: (roomId: number) => {
 		localStorage.setItem('currentRoom', roomId.toString());
 		set({ currentRoom: roomId });
 	},
 
-	setPlayerName: name => {
+	setPlayerName: (name: string) => {
+		localStorage.setItem('playerName', name.toString());
 		set({ playerName: name });
 	},
 
 	consumeHint: () =>
-		set(state => ({
+		set((state: GameStore) => ({
 			hintsRemaining: Math.max(0, state.hintsRemaining - 1),
 		})),
 
-	completeRoom: roomId =>
-		set(state => {
+	completeRoom: (roomId: number) =>
+		set((state: GameStore) => {
 			const completedRooms = [...state.completedRooms, roomId];
 			const endTime = roomId === 10 ? new Date() : state.endTime;
 			return { completedRooms, endTime };
 		}),
-}));
+});
+
+export const useGameStore = create<GameStore>()(
+	process.env.NODE_ENV !== 'production'
+		? devtools(store, { name: 'game-store' })
+		: store,
+);

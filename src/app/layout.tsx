@@ -10,7 +10,7 @@ const gaegu = Gaegu({
 
 export const metadata: Metadata = {
 	title: '방탈출 게임',
-	description: '10개의 방을 탈출하여 최종 목적지에 도달하세요!',
+	description: '20개의 방을 탈출하여 최종 목적지에 도달하세요!',
 };
 
 export default function RootLayout({

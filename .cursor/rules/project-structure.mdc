@@ -1,0 +1,42 @@
+---
+alwaysApply: true
+---
+
+# Escape Room Project Structure Guide
+
+This is a Next.js 15 escape room game with App Router architecture. Key files and directories:
+
+## Core Application Structure
+
+- [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout with Gaegu font and Korean language
+- [src/app/page.tsx](mdc:src/app/page.tsx) - Landing page redirecting to start screen
+- [src/app/start/page.tsx](mdc:src/app/start/page.tsx) - Player registration and session bootstrap
+- [src/app/escape/[roomId]/page.tsx](mdc:src/app/escape/[roomId]/page.tsx) - Dynamic puzzle room renderer
+- [src/app/finish/page.tsx](mdc:src/app/finish/page.tsx) - Leaderboard and completion summary
+
+## State Management & Data
+
+- [src/store/gameStore.ts](mdc:src/store/gameStore.ts) - Zustand store for game state (current room, hints, progress)
+- [src/lib/rooms.ts](mdc:src/lib/rooms.ts) - Puzzle data and room definitions
+- [src/lib/cardWords.ts](mdc:src/lib/cardWords.ts) - Card game word data
+- [src/types/room.ts](mdc:src/types/room.ts) - TypeScript interfaces for Room and GameState
+
+## Configuration Files
+
+- [package.json](mdc:package.json) - Dependencies and scripts (Node 22+ required)
+- [tsconfig.json](mdc:tsconfig.json) - TypeScript config with @/\* path alias
+- [tailwind.config.js](mdc:tailwind.config.js) - Tailwind CSS configuration
+- [next.config.ts](mdc:next.config.ts) - Next.js configuration
+
+## Assets & Media
+
+- [public/images/](mdc:public/images/) - Room backgrounds (prefer WebP format)
+- [public/assets/](mdc:public/assets/) - Game assets (sprites, textures)
+
+## Development Commands
+
+- `pnpm dev` - Development server with Turbopack
+- `pnpm build` - Production build
+- `pnpm start -- -p 10050` - Serve on port 10050
+- `pnpm lint` - ESLint check
+- `pnpm format` - Prettier formatting

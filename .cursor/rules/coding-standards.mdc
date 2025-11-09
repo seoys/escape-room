@@ -1,0 +1,39 @@
+---
+globs: *.ts,*.tsx,*.js,*.jsx
+---
+
+# Coding Standards for Escape Room Project
+
+## TypeScript & React Guidelines
+
+- Use TypeScript-first approach with strict mode enabled
+- Prefer React Server Components unless client state is required (`'use client'`)
+- Use functional components with hooks over class components
+- Import shared modules through `@/` alias instead of relative paths
+
+## Code Style & Formatting
+
+- Use tabs for indentation in UI files (preserve existing style)
+- Follow the existing `.cursorrules` guidelines for minimal code changes
+- Use early returns to avoid nested conditions
+- Prefer descriptive names with "handle" prefix for event handlers
+- Use constants over functions where possible
+
+## Component Organization
+
+- Components use PascalCase naming
+- Hooks use camelCase naming
+- Colocate related styles via Tailwind utility classes or `globals.css`
+- Order functions with composing functions appearing earlier in files
+
+## State Management
+
+- Use Zustand store in [src/store/gameStore.ts](mdc:src/store/gameStore.ts) for global game state
+- Local component state for UI-only state
+- Persist critical state to localStorage for session recovery
+
+## Error Handling
+
+- Add TODO comments for bugs or suboptimal code
+- Include proper error boundaries for React components
+- Handle async operations with proper error states

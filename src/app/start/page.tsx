@@ -1,100 +1,100 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
+
 export default function StartPage() {
+	const answerInputRef = useRef<HTMLInputElement>(null);
 	const [name, setName] = useState('');
+	const [isLoading, setIsLoading] = useState(true);
 	const router = useRouter();
+	const { setCurrentRoom } = useGameStore();
+
+	useEffect(() => {
+		if (!isLoading && answerInputRef.current) {
+			answerInputRef.current.focus();
+		}
+	}, [isLoading]);
 
 	const handleStart = async () => {
-		const host: string = window.location.hostname;
-		const userAgent: string = window.navigator.userAgent;
-		const language: string = window.navigator.language;
-		const platform: string = window.navigator.platform;
-		const screenWidth: number = window.screen.width;
-		const screenHeight: number = window.screen.height;
-		const timeZone: string =
-			Intl.DateTimeFormat().resolvedOptions().timeZone;
-		const now: string = new Date().toISOString();
-
 		if (!name.trim()) {
 			alert('이름을 입력해주세요. :)');
 			return;
 		}
 
-		const userData = await fetch(
-			`https://api.sosohappy.synology.me/v1/redis/escape_${name}`,
-		);
+		await useGameStore.getState().setPlayerName(name);
 
+		const userData = await fetch(
+			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}`,
+		);
 		const userDataJson = await userData.json();
 
 		if (userDataJson.result) {
 			const userInfo = JSON.parse(userDataJson.result);
 
-			if (userInfo.name == `escape_${name}`) {
+			if (
+				userInfo.name == name ||
+				userInfo.host == localStorage.getItem('userHost') ||
+				userInfo.userAgent == localStorage.getItem('userAgent') ||
+				userInfo.platform == localStorage.getItem('userPlatform')
+			) {
+				if (userInfo.roomId === 'finish') {
+					alert(
+						'이 이름은 이미 게임을 완료하였습니다. 랭킹페이지로 이동합니다.',
+					);
+
+					router.push('/finish');
+					return;
+				}
+
 				alert(
-					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다. :)',
+					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
 				);
+
+				setCurrentRoom(parseInt(userInfo.roomId));
 				router.push(`/escape/${userInfo.roomId}`);
 				return;
+			} else {
+				router.push(`/escape/1`);
 			}
 		}
 
 		const data = {
 			name: `escape_${name}`,
-			host,
-			userAgent,
-			language,
-			platform,
-			screenWidth,
-			screenHeight,
-			timeZone,
-			now,
+			host: localStorage.getItem('userHost'),
+			userAgent: localStorage.getItem('userAgent'),
+			platform: localStorage.getItem('userPlatform'),
+			now: localStorage.getItem('startTime'),
 			roomId: 1,
 		};
 
-		try {
-			const response = await fetch(
-				`https://api.sosohappy.synology.me/v1/redis/escape_${name}`,
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(data),
-				},
-			);
+		await fetch(
+			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
+			{
+				method: 'POST',
+			},
+		);
 
-			if (!response.ok) {
-				console.error('Failed to save user data:', response.statusText);
-				alert('데이터 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
-				return;
-			}
-		} catch (error) {
-			console.error('Failed to save user data:', error);
-			alert('데이터 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
-			return;
-		}
+		router.push('/escape/1'); // 다음 페이지 경로
 
 		// 추후 전역 상태 저장도 가능
 		// 예: useGameStore.getState().setPlayerName(name);
-		useGameStore.getState().setPlayerName(name);
-		useGameStore.getState().setHost(host);
-		useGameStore.getState().setUserAgent(userAgent);
-		useGameStore.getState().setLanguage(language);
-		useGameStore.getState().setPlatform(platform);
-		useGameStore.getState().setScreenWidth(screenWidth);
-		useGameStore.getState().setScreenHeight(screenHeight);
-		useGameStore.getState().setTimeZone(timeZone);
-		// router.push('/escape/1'); // 다음 페이지 경로
+
+		// useGameStore.getState().setHost(ipAddress);
+		// useGameStore.getState().setUserAgent(browserInfo.userAgent);
+		// useGameStore.getState().setPlatform(browserInfo.platform);
 	};
+
+	useEffect(() => {
+		setIsLoading(false);
+	}, []);
 
 	return (
 		<main className="min-h-screen flex items-center justify-center relative overflow-hidden">
 			<Image
-				src="/images/start_background.png"
+				src="/images/start_background.webp"
 				alt="배경 이미지"
 				fill
 				className="object-cover"
@@ -109,6 +109,7 @@ export default function StartPage() {
 						type="text"
 						value={name}
 						onChange={e => setName(e.target.value)}
+						ref={answerInputRef}
 						placeholder="이름 입력"
 						className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
 					/>
