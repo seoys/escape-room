@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useGameStore } from '@/store/gameStore';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { fetchLeaderboardSessions } from '@/lib/api/redisClient';
 
 export default function FinishPage() {
 	const { startTime, endTime } = useGameStore();
@@ -10,47 +11,54 @@ export default function FinishPage() {
 	const [topUsers, setTopUsers] = useState<
 		{ name: string; seconds: number }[]
 	>([]);
-
-	const calculateTime = () => {
-		if (!startTime || !endTime) return '시간 정보 없음';
-		const diff = endTime.getTime() - startTime.getTime();
-		const minutes = Math.floor(diff / 60000);
-		const seconds = Math.floor((diff % 60000) / 1000);
-		return `${minutes}분 ${seconds}초`;
-	};
+	const [timeLabel, setTimeLabel] = useState('시간 정보 없음');
+	const [leaderboardError, setLeaderboardError] = useState<string | null>(
+		null,
+	);
 
 	useEffect(() => {
 		const fetchTopUsers = async () => {
-			const topUser = await fetch(
-				`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/search/escape_`,
-			);
-			const topUserJson = await topUser.json();
-			const parsedTopUser = topUserJson.result;
-
-			const filteredTopUser = Object.values(parsedTopUser)
-				.map(item => JSON.parse(item as string))
-				.filter(
-					(item: { seconds: number }) =>
-						item.seconds !== undefined && item.seconds !== null,
-				)
-				.sort(
-					(a: { seconds: number }, b: { seconds: number }) =>
-						a.seconds - b.seconds,
-				)
-				.slice(0, 5);
-
-			setTopUsers(filteredTopUser);
+			try {
+				const sessions = await fetchLeaderboardSessions();
+				setTopUsers(
+					sessions.slice(0, 5).map(session => ({
+						name: session.name,
+						seconds: session.seconds ?? 0,
+					})),
+				);
+			} catch (error) {
+				console.error('Failed to load leaderboard', error);
+				setLeaderboardError('랭킹 정보를 불러오지 못했습니다.');
+			}
 		};
 
 		setPlayerName(localStorage.getItem('playerName') as string);
 
+		const storedStart =
+			startTime?.getTime() ??
+			(localStorage.getItem('startTime')
+				? new Date(localStorage.getItem('startTime') as string).getTime()
+				: null);
+		const storedEnd =
+			endTime?.getTime() ??
+			(localStorage.getItem('endTime')
+				? new Date(localStorage.getItem('endTime') as string).getTime()
+				: null);
+
+		if (storedStart && storedEnd) {
+			const diff = storedEnd - storedStart;
+			const minutes = Math.floor(diff / 60000);
+			const seconds = Math.floor((diff % 60000) / 1000);
+			setTimeLabel(`${minutes}분 ${seconds}초`);
+		}
+
 		fetchTopUsers();
-	}, []);
+	}, [endTime, startTime]);
 
 	return (
 		<main className="min-h-screen flex items-center justify-center relative overflow-hidden">
 			<Image
-				src="/images/finish_background.webp"
+				src="/images/finish_background.png"
 				alt="배경 이미지"
 				fill
 				className="object-cover"
@@ -69,37 +77,48 @@ export default function FinishPage() {
 							이름: {playerName}
 						</p>
 						<p className="text-lg font-medium text-orange-900">
-							총 소요 시간: {calculateTime()}
+							총 소요 시간: {timeLabel}
 						</p>
 					</div>
 					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner">
 						<h2 className="text-2xl font-bold text-orange-800 mb-4">
 							🏆 TOP 5
 						</h2>
-						<div className="space-y-3">
-							{topUsers.map((user, index) => (
-								<div
-									key={index}
-									className="flex items-center justify-between bg-white/80 p-3 rounded-lg"
-								>
-									<div className="flex items-center gap-2">
-										<span className="font-bold text-orange-600 w-8">
-											{index === 0 && '🥇'}
-											{index === 1 && '🥈'}
-											{index === 2 && '🥉'}
-											{index > 2 && '🎖️'}
-										</span>
-										<span className="font-medium">
-											{user.name.replace('escape_', '')}
+						{leaderboardError ? (
+							<p className="text-sm text-orange-900">
+								{leaderboardError}
+							</p>
+						) : (
+							<div className="space-y-3">
+								{topUsers.map((user, index) => (
+									<div
+										key={user.name}
+										className="flex items-center justify-between bg-white/80 p-3 rounded-lg"
+									>
+										<div className="flex items-center gap-2">
+											<span className="font-bold text-orange-600 w-8">
+												{index === 0 && '🥇'}
+												{index === 1 && '🥈'}
+												{index === 2 && '🥉'}
+												{index > 2 && '🎖️'}
+											</span>
+											<span className="font-medium">
+												{user.name.replace('escape_', '')}
+											</span>
+										</div>
+										<span className="text-gray-600">
+											{Math.floor(user.seconds / 60)}분{' '}
+											{user.seconds % 60}초
 										</span>
 									</div>
-									<span className="text-gray-600">
-										{Math.floor(user.seconds / 60)}분{' '}
-										{user.seconds % 60}초
-									</span>
-								</div>
-							))}
-						</div>
+								))}
+								{topUsers.length === 0 ? (
+									<p className="text-sm text-orange-900">
+										아직 랭킹 정보가 없습니다.
+									</p>
+								) : null}
+							</div>
+						)}
 					</div>
 
 					<Link

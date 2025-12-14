@@ -5,24 +5,29 @@ interface CardProps {
 	word: string;
 	index: number;
 	onClick: (index: number) => void;
-	isFlipped: boolean;
+	isFaceUp: boolean;
 }
 
-export default function Card({ word, index, onClick, isFlipped }: CardProps) {
+export default function Card({
+	word,
+	index,
+	onClick,
+	isFaceUp,
+}: CardProps) {
 	return (
 		<div
 			className="w-20 h-32 perspective cursor-pointer"
 			onClick={() => onClick(index)}
 		>
 			<div
-				className={`relative w-full h-full transition-transform duration-500 transform ${isFlipped ? 'rotate-y-180' : ''}`}
+				className={`relative w-full h-full transition-transform duration-500 preserve-3d ${isFaceUp ? '' : 'rotate-y-180'}`}
 			>
 				{/* 카드 앞면 */}
 				<div className="absolute w-full h-full backface-hidden bg-white border-2 border-orange-300 rounded-xl flex items-center justify-center text-2xl font-bold text-orange-800">
 					{word}
 				</div>
 				{/* 카드 뒷면 */}
-				<div className="absolute w-full h-full backface-hidden">
+				<div className="absolute w-full h-full backface-hidden rotate-y-180">
 					<Image
 						src="/images/card-back.png"
 						alt="카드 뒷면"

@@ -2,18 +2,30 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { GameState } from '@/types/room';
 import { getBrowserInfo, getIpAddress } from '@/lib/utils/userInfo';
+import { rooms } from '@/lib/rooms';
+
+const getInitialHintsRemaining = () => {
+	if (typeof window === 'undefined') return 3;
+	const stored = parseInt(
+		(localStorage.getItem('hintsRemaining') as string) ?? '',
+		10,
+	);
+	if (Number.isFinite(stored) && stored >= 0) return stored;
+	return 3;
+};
 interface GameStore extends GameState {
 	initGame: () => Promise<void>;
 	setCurrentRoom: (roomId: number) => void;
 	consumeHint: () => void;
 	completeRoom: (roomId: number) => void;
 	setPlayerName: (name: string) => void;
+	setHintsRemaining: (value: number) => void;
 }
 
 // @ts-expect-error - Complex type inference with zustand devtools
 const store = set => ({
 	currentRoom: 1,
-	hintsRemaining: 3,
+	hintsRemaining: getInitialHintsRemaining(),
 	completedRooms: [],
 	startTime: undefined,
 	endTime: undefined,
@@ -31,6 +43,7 @@ const store = set => ({
 		localStorage.setItem('userAgent', browserInfo.userAgent);
 		localStorage.setItem('userPlatform', browserInfo.platform);
 		localStorage.setItem('startTime', new Date().toISOString());
+		localStorage.setItem('hintsRemaining', '3');
 		set({
 			currentRoom: 1,
 			hintsRemaining: 3,
@@ -54,15 +67,32 @@ const store = set => ({
 		set({ playerName: name });
 	},
 
+	setHintsRemaining: (value: number) => {
+		localStorage.setItem('hintsRemaining', value.toString());
+		set({ hintsRemaining: value });
+	},
+
 	consumeHint: () =>
-		set((state: GameStore) => ({
-			hintsRemaining: Math.max(0, state.hintsRemaining - 1),
-		})),
+		set((state: GameStore) => {
+			const nextHints = Math.max(0, state.hintsRemaining - 1);
+			if (typeof window !== 'undefined') {
+				localStorage.setItem('hintsRemaining', nextHints.toString());
+			}
+			return { hintsRemaining: nextHints };
+		}),
 
 	completeRoom: (roomId: number) =>
 		set((state: GameStore) => {
 			const completedRooms = [...state.completedRooms, roomId];
-			const endTime = roomId === 10 ? new Date() : state.endTime;
+			const isFinalRoom =
+				roomId >= rooms[rooms.length - 1]?.id &&
+				typeof window !== 'undefined';
+			const endTime = isFinalRoom ? new Date() : state.endTime;
+
+			if (isFinalRoom && endTime) {
+				localStorage.setItem('endTime', endTime.toISOString());
+			}
+
 			return { completedRooms, endTime };
 		}),
 });

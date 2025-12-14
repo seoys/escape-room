@@ -13,18 +13,20 @@ function shuffle<T>(array: T[]): T[] {
 
 export default function CardGamePage() {
 	const [shuffledWords, setShuffledWords] = useState<string[]>([]);
-	const [flipped, setFlipped] = useState<boolean[]>([]);
+	const [faceUpCards, setFaceUpCards] = useState<boolean[]>([]);
 
 	useEffect(() => {
 		const shuffled = shuffle([...cardWords]);
 		setShuffledWords(shuffled);
-		setFlipped(Array(shuffled.length).fill(true)); // 처음에는 모든 카드가 뒷면
+		setFaceUpCards(Array(shuffled.length).fill(false));
 	}, []);
 
-	const handleCardClick = () => {
-		const newFlipped = [...flipped];
-		// newFlipped[index] = !newFlipped[index]; // 클릭할 때마다 앞/뒷면 토글
-		setFlipped(newFlipped);
+	const handleCardClick = (index: number) => {
+		setFaceUpCards(prev =>
+			prev.map((isFaceUp, cardIndex) =>
+				cardIndex === index ? !isFaceUp : isFaceUp,
+			),
+		);
 	};
 
 	return (
@@ -35,7 +37,7 @@ export default function CardGamePage() {
 						key={index}
 						word={word}
 						index={index}
-						isFlipped={!flipped[index]} // isFlipped 값을 반전
+						isFaceUp={Boolean(faceUpCards[index])}
 						onClick={handleCardClick}
 					/>
 				))}

@@ -4,13 +4,17 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
+import { readSession, writeSession } from '@/lib/api/redisClient';
+import { StoredSession } from '@/types/session';
 
 export default function StartPage() {
 	const answerInputRef = useRef<HTMLInputElement>(null);
 	const [name, setName] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const router = useRouter();
-	const { setCurrentRoom } = useGameStore();
+	const { setCurrentRoom, setHintsRemaining } = useGameStore();
 
 	useEffect(() => {
 		if (!isLoading && answerInputRef.current) {
@@ -18,83 +22,110 @@ export default function StartPage() {
 		}
 	}, [isLoading]);
 
+	useEffect(() => {
+		const bootstrap = async () => {
+			if (!localStorage.getItem('startTime')) {
+				try {
+					await useGameStore.getState().initGame();
+				} catch (error) {
+					console.error('Failed to initialize game session', error);
+				}
+			}
+
+			const storedName = localStorage.getItem('playerName');
+			if (storedName) {
+				setName(storedName);
+			}
+
+			setIsLoading(false);
+		};
+
+		bootstrap();
+	}, []);
+
 	const handleStart = async () => {
 		if (!name.trim()) {
-			alert('이름을 입력해주세요. :)');
+			setErrorMessage('이름을 입력해주세요. :)');
 			return;
 		}
 
-		await useGameStore.getState().setPlayerName(name);
+		setErrorMessage(null);
+		setIsSubmitting(true);
 
-		const userData = await fetch(
-			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}`,
-		);
-		const userDataJson = await userData.json();
+		const trimmedName = name.trim();
+		const sessionKey = `escape_${trimmedName}`;
 
-		if (userDataJson.result) {
-			const userInfo = JSON.parse(userDataJson.result);
+		try {
+			await useGameStore.getState().setPlayerName(trimmedName);
 
-			if (
-				userInfo.name == name ||
-				userInfo.host == localStorage.getItem('userHost') ||
-				userInfo.userAgent == localStorage.getItem('userAgent') ||
-				userInfo.platform == localStorage.getItem('userPlatform')
-			) {
-				if (userInfo.roomId === 'finish') {
+			const existingSession = await readSession(trimmedName);
+
+			if (existingSession) {
+				if (
+					typeof existingSession.hintsRemaining === 'number' &&
+					existingSession.hintsRemaining >= 0
+				) {
+					setHintsRemaining(existingSession.hintsRemaining);
+				}
+
+				const isSameUser =
+					existingSession.name === sessionKey &&
+					(existingSession.host ===
+						localStorage.getItem('userHost') ||
+						existingSession.userAgent ===
+							localStorage.getItem('userAgent') ||
+						existingSession.platform ===
+							localStorage.getItem('userPlatform'));
+
+				if (existingSession.roomId === 'finish') {
 					alert(
-						'이 이름은 이미 게임을 완료하였습니다. 랭킹페이지로 이동합니다.',
+						'이 이름은 이미 게임을 완료했습니다. 랭킹 페이지로 이동합니다.',
 					);
-
 					router.push('/finish');
 					return;
 				}
 
-				alert(
-					'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
-				);
+				if (isSameUser) {
+					alert(
+						'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
+					);
 
-				setCurrentRoom(parseInt(userInfo.roomId));
-				router.push(`/escape/${userInfo.roomId}`);
-				return;
-			} else {
-				router.push(`/escape/1`);
+					const nextRoomId = Number(existingSession.roomId) || 1;
+					setCurrentRoom(nextRoomId);
+					router.push(`/escape/${nextRoomId}`);
+					return;
+				}
 			}
+
+			const payload: StoredSession = {
+				name: sessionKey,
+				host: localStorage.getItem('userHost'),
+				userAgent: localStorage.getItem('userAgent'),
+				platform: localStorage.getItem('userPlatform'),
+				now: localStorage.getItem('startTime'),
+				roomId: 1,
+				hintsRemaining: 3,
+			};
+
+			await writeSession(trimmedName, payload);
+
+			setHintsRemaining(3);
+			setCurrentRoom(1);
+			router.push('/escape/1');
+		} catch (error) {
+			console.error('Failed to start game', error);
+			setErrorMessage(
+				'게임을 시작하는 중 문제가 발생했습니다. 네트워크 상태를 확인한 뒤 다시 시도해주세요.',
+			);
+		} finally {
+			setIsSubmitting(false);
 		}
-
-		const data = {
-			name: `escape_${name}`,
-			host: localStorage.getItem('userHost'),
-			userAgent: localStorage.getItem('userAgent'),
-			platform: localStorage.getItem('userPlatform'),
-			now: localStorage.getItem('startTime'),
-			roomId: 1,
-		};
-
-		await fetch(
-			`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${name}?data=${encodeURIComponent(JSON.stringify(data))}`,
-			{
-				method: 'POST',
-			},
-		);
-
-		router.push('/escape/1'); // 다음 페이지 경로
-
-		// 추후 전역 상태 저장도 가능
-		// 예: useGameStore.getState().setPlayerName(name);
-
-		// useGameStore.getState().setHost(ipAddress);
-		// useGameStore.getState().setUserAgent(browserInfo.userAgent);
-		// useGameStore.getState().setPlatform(browserInfo.platform);
 	};
-
-	useEffect(() => {
-		setIsLoading(false);
-	}, []);
 
 	return (
 		<main className="min-h-screen flex items-center justify-center relative overflow-hidden">
 			<Image
-				src="/images/start_background.webp"
+				src="/images/escape_room_main.png"
 				alt="배경 이미지"
 				fill
 				className="object-cover"
@@ -113,11 +144,21 @@ export default function StartPage() {
 						placeholder="이름 입력"
 						className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
 					/>
+					{errorMessage ? (
+						<p className="mb-4 text-sm text-red-600">
+							{errorMessage}
+						</p>
+					) : null}
 					<button
 						onClick={handleStart}
-						className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+						disabled={isSubmitting || isLoading}
+						className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
 					>
-						확인
+						{isLoading
+							? '준비 중...'
+							: isSubmitting
+								? '확인 중...'
+								: '확인'}
 					</button>
 				</div>
 			</div>

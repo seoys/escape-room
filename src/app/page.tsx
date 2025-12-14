@@ -6,12 +6,12 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 const KEYHOLE_POSITION = { x: 50, y: 40 };
 const KEYHOLE_RADIUS = 4;
 const KEY_RANGE = {
-	x: { min: 20, max: 80 },
-	y: { min: 72, max: 88 },
+	x: { min: 10, max: 90 },
+	y: { min: 10, max: 90 },
 };
 const INITIAL_KEY_POSITION = {
 	x: (KEY_RANGE.x.min + KEY_RANGE.x.max) / 2,
-	y: KEY_RANGE.y.max,
+	y: KEY_RANGE.y.max - 5,
 };
 
 const getRandomKeyPosition = () => ({
@@ -85,6 +85,7 @@ export default function Home() {
 	);
 
 	const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+		event.preventDefault();
 		const pointerPercent = getPointerPercentage(
 			event.clientX,
 			event.clientY,
@@ -102,6 +103,7 @@ export default function Home() {
 	};
 
 	const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+		event.preventDefault();
 		if (!isDragging || event.pointerId !== dragPointerId) return;
 		updateKeyDirectly(event.clientX, event.clientY);
 	};
@@ -158,7 +160,7 @@ export default function Home() {
 		try {
 			await initGame();
 			setPlayerNameInStore(playerName.trim());
-			router.push('/start');
+			router.push('/escape/1');
 		} catch (error) {
 			console.error('Failed to start game', error);
 			setFormError(
@@ -173,6 +175,7 @@ export default function Home() {
 			<div
 				ref={playgroundRef}
 				className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 text-center text-white"
+				style={{ touchAction: 'none' }}
 			>
 				<div className="mb-8 max-w-md rounded-full bg-black/50 px-6 py-3 text-sm font-medium tracking-wide backdrop-blur">
 					열쇠🔑를 잡고 가운데 열쇠구멍에 끼워보세요.
@@ -193,7 +196,7 @@ export default function Home() {
 					role="button"
 					tabIndex={0}
 					aria-label="열쇠를 드래그 해서 문을 열기"
-					className="absolute z-10 cursor-grab active:cursor-grabbing"
+					className="absolute z-10 cursor-grab select-none active:cursor-grabbing touch-none"
 					style={{
 						left: `${keyPosition.x}%`,
 						top: `${keyPosition.y}%`,

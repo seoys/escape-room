@@ -5,6 +5,8 @@ import { useGameStore } from '@/store/gameStore';
 import { rooms } from '@/lib/rooms';
 import { Black_Han_Sans } from 'next/font/google';
 import Image from 'next/image';
+import { writeSession } from '@/lib/api/redisClient';
+import { StoredSession } from '@/types/session';
 
 const blackHanSans = Black_Han_Sans({
 	weight: '400',
@@ -15,7 +17,8 @@ const blackHanSans = Black_Han_Sans({
 export default function RoomPage() {
 	const params = useParams();
 	const router = useRouter();
-	const roomId = parseInt(params.roomId as string);
+	const parsedRoomId = Number.parseInt(params.roomId as string, 10);
+	const roomId = Number.isFinite(parsedRoomId) ? parsedRoomId : 1;
 	const {
 		currentRoom,
 		hintsRemaining,
@@ -25,17 +28,24 @@ export default function RoomPage() {
 	} = useGameStore();
 
 	const answerInputRef = useRef<HTMLInputElement>(null);
+	const initialRoomRef = useRef(currentRoom);
 	const [answer, setAnswer] = useState('');
 	const [showHint, setShowHint] = useState(false);
 	const [error, setError] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
+	const [hydratedRoom, setHydratedRoom] = useState<number | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	useEffect(() => {
 		const savedRoom = localStorage.getItem('currentRoom');
-		if (savedRoom) {
-			setCurrentRoom(parseInt(savedRoom));
-		}
-	}, []);
+		const fallbackRoom = Number.isFinite(initialRoomRef.current)
+			? initialRoomRef.current
+			: 1;
+		const roomToUse = savedRoom ? parseInt(savedRoom, 10) : fallbackRoom;
+
+		setCurrentRoom(roomToUse);
+		setHydratedRoom(roomToUse);
+	}, [setCurrentRoom]);
 
 	useEffect(() => {
 		if (!isLoading && answerInputRef.current) {
@@ -44,81 +54,102 @@ export default function RoomPage() {
 	}, [isLoading]);
 
 	useEffect(() => {
-		const loadRoom = async () => {
+		if (hydratedRoom === null) return;
+
+		const targetRoom = rooms.find(r => r.id === roomId);
+		if (!targetRoom) {
+			router.replace(`/escape/${rooms[0].id}`);
+			return;
+		}
+
+		if (roomId !== hydratedRoom) {
+			router.replace(`/escape/${hydratedRoom}`);
+			return;
+		}
+
+		const persistRoomEntry = async () => {
 			try {
-				const room = rooms.find(r => r.id === roomId);
-				if (!room || roomId !== currentRoom) {
-					router.push('/escape/' + currentRoom);
+				const playerName = localStorage.getItem('playerName');
+				if (!playerName) {
+					router.replace('/');
 					return;
 				}
 
-				const playerName = localStorage.getItem('playerName');
-
-				const data = {
+				const payload: StoredSession = {
 					name: `escape_${playerName}`,
 					host: localStorage.getItem('userHost'),
 					userAgent: localStorage.getItem('userAgent'),
 					platform: localStorage.getItem('userPlatform'),
 					now: localStorage.getItem('startTime'),
 					roomId,
+					hintsRemaining,
 				};
 
-				fetch(
-					`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
-					{
-						method: 'POST',
-					},
-				);
-
-				setIsLoading(false);
+				await writeSession(playerName, payload);
 			} catch (err) {
-				console.error('Failed to load room:', err);
-				router.push('/');
+				console.error('Failed to persist room progress', err);
+			} finally {
+				setIsLoading(false);
 			}
 		};
-		loadRoom();
-	}, [roomId, currentRoom, router]);
+
+		persistRoomEntry();
+	}, [hydratedRoom, roomId, router, hintsRemaining]);
 
 	const room = rooms.find(r => r.id === roomId);
 	if (isLoading || !room) return <div className="text-white">Loading...</div>;
 
 	const calculateSeconds = () => {
-		const diff =
-			new Date().getTime() -
-			new Date(localStorage.getItem('startTime') as string).getTime();
+		const startTime = localStorage.getItem('startTime');
+		if (!startTime) return null;
 
-		const seconds = Math.floor(diff / 1000);
-		return seconds;
+		const diff = Date.now() - new Date(startTime).getTime();
+		return Math.max(0, Math.floor(diff / 1000));
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (answer.toLowerCase() === room.answer.toLowerCase()) {
-			completeRoom(roomId);
-			if (roomId === 12) {
-				const playerName = localStorage.getItem('playerName');
+	const finalRoomId = rooms[rooms.length - 1]?.id ?? roomId;
 
-				const data = {
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		if (isSubmitting) return;
+
+		if (answer.trim().toLowerCase() === room.answer.toLowerCase()) {
+			setIsSubmitting(true);
+			completeRoom(roomId);
+
+			const isLastRoom = roomId >= finalRoomId;
+			if (isLastRoom) {
+				const playerName = localStorage.getItem('playerName') || '';
+				const seconds = calculateSeconds();
+				const endTimestamp = new Date().toISOString();
+
+				const payload: StoredSession = {
 					name: `escape_${playerName}`,
 					host: localStorage.getItem('userHost'),
 					userAgent: localStorage.getItem('userAgent'),
 					platform: localStorage.getItem('userPlatform'),
 					roomId: 'finish',
 					now: localStorage.getItem('startTime'),
-					end: new Date().toISOString(),
-					seconds: calculateSeconds(),
+					end: endTimestamp,
+					seconds: seconds ?? undefined,
+					hintsRemaining,
 				};
 
-				fetch(
-					`${process.env.NEXT_PUBLIC_API_URL}/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(data))}`,
-					{
-						method: 'POST',
-					},
-				);
+				try {
+					if (playerName) {
+						await writeSession(playerName, payload);
+					}
+					localStorage.setItem('endTime', endTimestamp);
+				} catch (err) {
+					console.error('Failed to write completion session', err);
+				} finally {
+					setIsSubmitting(false);
+				}
 
 				router.push('/finish');
 			} else {
 				setCurrentRoom(roomId + 1);
+				setIsSubmitting(false);
 				router.push(`/escape/${roomId + 1}`);
 			}
 		} else {
@@ -129,8 +160,25 @@ export default function RoomPage() {
 
 	const handleHint = () => {
 		if (hintsRemaining > 0) {
+			const nextHints = Math.max(0, hintsRemaining - 1);
 			consumeHint();
 			setShowHint(true);
+
+			const playerName = localStorage.getItem('playerName') || '';
+			if (playerName) {
+				const payload: StoredSession = {
+					name: `escape_${playerName}`,
+					host: localStorage.getItem('userHost'),
+					userAgent: localStorage.getItem('userAgent'),
+					platform: localStorage.getItem('userPlatform'),
+					now: localStorage.getItem('startTime'),
+					roomId,
+					hintsRemaining: nextHints,
+				};
+				writeSession(playerName, payload).catch(error => {
+					console.warn('Failed to persist hint usage', error);
+				});
+			}
 		}
 	};
 
@@ -152,7 +200,7 @@ export default function RoomPage() {
 					left: 0,
 					width: '100%',
 					height: '100%',
-					backgroundImage: `url(/images/escape_room_${roomId}.webp)`,
+					backgroundImage: `url(/images/escape_room_${roomId}.png)`,
 					backgroundSize: 'cover',
 					backgroundAttachment: 'fixed',
 					zIndex: -1,
@@ -172,19 +220,8 @@ export default function RoomPage() {
 						{roomId === 10 && (
 							<div className="mt-8 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/30">
 								<Image
-									src="/images/escape_room_11.webp"
+									src="/images/escape_room_11.png"
 									alt="밀레"
-									className="w-full max-w-2xl mx-auto"
-									width={1000}
-									height={1000}
-								/>
-							</div>
-						)}
-						{roomId === 12 && (
-							<div className="mt-8 rounded-xl overflow-hidden shadow-2xl border-4 border-amber-500/30">
-								<Image
-									src="/images/youtube.gif"
-									alt="개와 닭"
 									className="w-full max-w-2xl mx-auto"
 									width={1000}
 									height={1000}
@@ -233,27 +270,22 @@ export default function RoomPage() {
 							<div className="flex gap-3 md:gap-4">
 								<button
 									type="submit"
-									className="h-10 md:h-12 flex-1
-		                  bg-gradient-to-br from-green-500/90 to-green-700/90
-		                  hover:from-green-400/90 hover:to-green-600/90
-		                  rounded-xl text-base md:text-lg font-bold text-white tracking-wider
-		                  transition-all duration-200 ease-out
-		                  hover:scale-[1.01] active:scale-[0.99]
-		                  border border-green-400/20
-		                  shadow-lg shadow-green-900/30
-		                  backdrop-blur-sm"
+									disabled={isSubmitting}
+									className="h-10 md:h-12 flex-1 rounded-xl text-base md:text-lg font-semibold text-white tracking-wider
+		                  bg-emerald-600 hover:bg-emerald-500 focus-visible:ring-2 focus-visible:ring-emerald-200 focus-visible:outline-none
+		                  transition-transform duration-150 ease-out hover:translate-y-[-1px] active:translate-y-[0]
+		                  shadow-lg shadow-emerald-900/30 disabled:opacity-70 disabled:cursor-not-allowed"
 								>
-									제출하기
+									{isSubmitting ? '확인 중...' : '제출하기'}
 								</button>
 								<button
 									type="button"
 									onClick={handleHint}
 									disabled={hintsRemaining === 0 || showHint}
-									className={`h-10 md:h-12 flex-1 rounded-xl text-base md:text-lg font-bold tracking-wide
-		                  transition-all duration-200 ease-out backdrop-blur-sm
+									className={`h-10 md:h-12 flex-1 rounded-xl text-base md:text-lg font-semibold tracking-wide transition-colors duration-150
 		                  ${
 								hintsRemaining > 0 && !showHint
-									? 'bg-gradient-to-br from-amber-500/90 to-amber-700/90 hover:from-amber-400/90 hover:to-amber-600/90 text-white border border-amber-400/20 shadow-lg shadow-amber-900/30 hover:scale-[1.01] active:scale-[0.99]'
+									? 'bg-amber-500 hover:bg-amber-400 text-white shadow-lg shadow-amber-900/30 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-none'
 									: 'bg-gray-700/60 text-gray-400 border border-gray-600/30 cursor-not-allowed'
 							}`}
 								>
@@ -264,30 +296,18 @@ export default function RoomPage() {
 								<button
 									type="button"
 									onClick={handleBack}
-									className="h-10 md:h-12 flex-1
-		                  bg-gradient-to-br from-gray-600/90 to-gray-800/90
-		                  hover:from-gray-500/90 hover:to-gray-700/90
-		                  rounded-xl text-base md:text-lg font-bold text-white tracking-wider
-		                  transition-all duration-200 ease-out
-		                  hover:scale-[1.01] active:scale-[0.99]
-		                  border border-gray-400/20
-		                  shadow-lg shadow-gray-900/30
-		                  backdrop-blur-sm"
+									className="h-10 md:h-12 flex-1 rounded-xl text-base md:text-lg font-semibold text-white tracking-wider
+		                  bg-slate-700 hover:bg-slate-600 focus-visible:ring-2 focus-visible:ring-slate-200 focus-visible:outline-none
+		                  transition-transform duration-150 ease-out hover:translate-y-[-1px] active:translate-y-[0]"
 								>
 									뒤로가기
 								</button>
 								<button
 									type="button"
 									onClick={() => router.push('/')}
-									className="h-10 md:h-12 flex-1
-		                  bg-gradient-to-br from-red-500/90 to-red-700/90
-		                  hover:from-red-400/90 hover:to-red-600/90
-		                  rounded-xl text-base md:text-lg font-bold text-white tracking-wider
-		                  transition-all duration-200 ease-out
-		                  hover:scale-[1.01] active:scale-[0.99]
-		                  border border-red-400/20
-		                  shadow-lg shadow-red-900/30
-		                  backdrop-blur-sm"
+									className="h-10 md:h-12 flex-1 rounded-xl text-base md:text-lg font-semibold text-white tracking-wider
+		                  bg-rose-600 hover:bg-rose-500 focus-visible:ring-2 focus-visible:ring-rose-200 focus-visible:outline-none
+		                  transition-transform duration-150 ease-out hover:translate-y-[-1px] active:translate-y-[0]"
 								>
 									메인으로
 								</button>
