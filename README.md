@@ -1,67 +1,110 @@
-# Escape Room Web Game
+# 🤔 Escape Room Web Game
 
-Interactive web escape-room experience featuring a sequence of themed puzzles, persistent player sessions, and a live leaderboard backed by Redis.
+A web-based interactive escape room experience featuring 25 stages of logic puzzles, math riddles, and lateral thinking challenges. Players progress through rooms, solving clues to unlock the next stage, with their session state persisted automatically.
 
-## Overview
-- Players register on `/start`, receive three shared hints, and advance through numbered rooms hosted under `/escape/[roomId]`.
-- Puzzle content, answers, and media live in `src/lib/rooms.ts` and `public/images`, enabling designers to iterate without touching routing code.
-- Server-side APIs (provided separately) are reached via `NEXT_PUBLIC_API_URL` to track session metadata, hint usage, and leaderboard entries exposed on `/finish`.
+## ✨ Features
 
-## Key Features
-- Puzzle progression gatekept by Zustand store and localStorage, with resume support for returning players.
-- Automatic Redis logging on room entry/exit for analytics and ranking.
-- Responsive Tailwind-driven UI with optimized WebP backgrounds per room.
-- Finish page pulls top completion times and highlights the current player.
+- **25 Challenging Levels**: A curated sequence of puzzles ranging from "Alphabet Sequences" and "Logic Traps" to complex "Optimization Algorithms".
+- **Diverse Puzzle Types**:
+    - 🧩 **Logic & Patterns**: Deduce rules from sequences and shapes.
+    - 🔢 **Math & Calculation**: Solve riddles involving numbers and equations.
+    - 💡 **Lateral Thinking**: "Out of the box" solutions where the obvious answer is often wrong.
+    - 🕵️ **Observation**: Find clues hidden in plain sight or keyboard layouts.
+- **Persistent Sessions**: Game progress (current room, hints used) is saved via Redis, allowing players to resume later.
+- **Real-time Leaderboard**: A finish screen that ranks players by their total completion time.
+- **Responsive Design**: precise UI built with Tailwind CSS, suitable for desktop and mobile.
 
-## Tech Stack
-- Next.js 15 (App Router, React Server + Client Components)
-- React 19 + Zustand state management
-- Tailwind CSS with custom scrollbar plugin
-- Redis (remote) for persistence and leaderboard storage
+## 🛠 Tech Stack
 
-## Project Structure
-```
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router, React Server Components)
+- **Language**: TypeScript / React 19
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Styling**: Tailwind CSS
+- **Backend Storage**: Redis (accessed via HTTP API)
+- **Deployment**: PM2 (Process Manager)
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 22.0.0 or higher
+- pnpm (enable with `corepack enable`)
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd escape-room
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pnpm install
+   ```
+
+3. **Environment Setup**:
+   Create a `.env.local` file in the root directory:
+   ```env
+   NEXT_PUBLIC_API_URL=https://your-api-gateway.com
+   ```
+   > **Note**: The application expects an API that exposes endpoints like `/v1/redis/escape_{username}` for session management.
+
+4. **Run Locally**:
+   ```bash
+   pnpm dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) to start the game.
+
+## 📂 Project Structure
+
+```bash
 src/
-  app/
-    page.tsx          # landing page -> start screen
-    start/            # player registration and session bootstrap
-    escape/[roomId]/  # dynamic puzzle room renderer
-    finish/           # leaderboard and completion summary
-  components/         # shared UI (e.g., Card)
-  lib/                # puzzle data, helpers, user info utils
-  store/              # Zustand game state store
-  types/              # shared TypeScript definitions
-public/
-  images/             # room backgrounds (prefer WebP)
-  assets/             # auxiliary media
+├── app/
+│   ├── start/           # Player registration & session creation
+│   ├── escape/[roomId]/ # Main game interface (Dynamic Routing)
+│   └── finish/          # Leaderboard & final results
+├── lib/
+│   ├── rooms.ts         # 🛑 CORE GAME DATA (Questions, Answers, Hints)
+│   └── api/             # Redis client wrapper
+└── store/               # Zustand store for client-side state
 ```
 
-## Getting Started
-1. Install Node.js 22+ and enable pnpm (`corepack enable`).
-2. Install dependencies: `pnpm install`.
-3. Create `.env.local` and provide `NEXT_PUBLIC_API_URL` pointing to the Redis API gateway.
-4. Run the dev server: `pnpm dev` (Turbopack) and open `http://localhost:3000`.
+## 🌍 Deployment using PM2
 
-## Environment Variables
-- `NEXT_PUBLIC_API_URL`: Base URL for escape-room Redis endpoints (e.g., `https://api.example.com`). Must expose `/v1/redis/...` routes used for player state and leaderboard queries.
+This project includes pre-configured scripts for deployment using PM2.
 
-## Available Scripts
-- `pnpm dev` — start Next.js with Turbopack for local development.
-- `pnpm build` — generate the production build.
-- `pnpm start -- -p 10050` — serve the build locally on port 10050.
-- `pnpm lint` — run ESLint with the Next.js configuration.
-- `pnpm format` / `pnpm format:check` — apply or verify Prettier formatting.
-- `pnpm pm2:start|stop|restart|delete|logs|monit` — helper commands around the PM2 ecosystem config in `eco.config.js` for server deploys.
+- **Start/Deploy**:
+  ```bash
+  pnpm pm2:start
+  ```
+  *Performs: `git pull` -> `build` -> `pm2 start` on port **10050**.*
 
-## Game Data & Testing
-- Update puzzle metadata in `src/lib/rooms.ts`, card content in `src/lib/cardWords.ts`, and shared helpers under `src/lib/utils/`.
-- Add future tests using React Testing Library/Playwright under `src/**/__tests__` with the `*.test.tsx` naming pattern. Until automation lands, document manual QA steps in PRs.
+- **Restart**:
+  ```bash
+  pnpm pm2:restart
+  ```
+  *Performs: `git pull` -> `build` -> `pm2 restart`.*
 
-## Deployment Notes
-- The production process expects a Redis instance reachable from the configured API URL.
-- For PM2 hosting, build locally (`pnpm build`) and manage processes with the scripts above; `eco.config.js` defines the runtime entry.
+- **Other Commands**:
+  - `pnpm pm2:stop`: Stop the server.
+  - `pnpm pm2:logs`: View real-time server logs.
+  - `pnpm pm2:monit`: Monitor server resources.
 
-## Contributing
-- Follow the repository guide in `AGENTS.md` for style, testing, and PR expectations.
-- Keep commit messages in the `type: summary` format (e.g., `feat: add room timer`).
-- Coordinate puzzle content changes with updates to `spec.md` so designers and developers stay aligned.
+## 📝 Editing Game Content
+
+All puzzle data is located in `src/lib/rooms.ts`. To add or modify a stage:
+
+```typescript
+{
+    id: 26, // Unique ID
+    title: 'New Puzzle',
+    question: 'Riddle text here...',
+    answer: 'key', // The answer players must type
+    hint: 'Helpful clue...',
+    type: 'Logic',
+    difficulty: 5
+}
+```
+
+---
+*Escape Room Project*

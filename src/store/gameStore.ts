@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { GameState } from '@/types/room';
 import { getBrowserInfo, getIpAddress } from '@/lib/utils/userInfo';
-import { rooms } from '@/lib/rooms';
+import { TOTAL_ROOMS } from '@/lib/constants';
 
 const getInitialHintsRemaining = () => {
 	if (typeof window === 'undefined') return 3;
@@ -85,7 +85,7 @@ const store = set => ({
 		set((state: GameStore) => {
 			const completedRooms = [...state.completedRooms, roomId];
 			const isFinalRoom =
-				roomId >= rooms[rooms.length - 1]?.id &&
+				roomId >= TOTAL_ROOMS &&
 				typeof window !== 'undefined';
 			const endTime = isFinalRoom ? new Date() : state.endTime;
 
