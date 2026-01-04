@@ -1,7 +1,7 @@
 import { rooms } from '@/lib/rooms-data';
 import { notFound, redirect } from 'next/navigation';
 import RoomClient from './RoomClient';
-import { TOTAL_ROOMS } from '@/lib/constants';
+
 
 interface PageProps {
   params: Promise<{ roomId: string }>;
@@ -25,7 +25,14 @@ export default async function RoomPage({ params }: PageProps) {
   }
 
   // Sanitize: Security measure to remove answer from client payload
-  const { answer, ...sanitizedRoom } = room;
+  const sanitizedRoom = {
+    id: room.id,
+    title: room.title,
+    question: room.question,
+    hint: room.hint,
+    type: room.type,
+    difficulty: room.difficulty
+  };
   const isLastRoom = room.id === rooms[rooms.length - 1]?.id;
 
   return (
