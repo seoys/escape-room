@@ -41,6 +41,31 @@
   animation: fadeInScale 0.5s ease-out forwards;
 }
 
+@keyframes screen-tear {
+  0% { transform: translate(0) skew(0) scale(1); filter: none; clip-path: none; }
+  10% { transform: translate(-10px, 5px) skew(-10deg) scale(1.02); filter: contrast(200%) hue-rotate(90deg); clip-path: inset(10% 0 80% 0); }
+  20% { transform: translate(10px, -5px) skew(10deg) scale(0.98); filter: contrast(100%) hue-rotate(-90deg); clip-path: inset(80% 0 10% 0); }
+  30% { transform: translate(-5px, 5px) skew(-5deg) scale(1.01); filter: contrast(200%); clip-path: inset(40% 0 40% 0); }
+  40% { transform: translate(5px, -5px) skew(5deg) scale(0.99); filter: none; clip-path: inset(0% 0 0% 0); }
+  50% { transform: translate(0) skew(0) scale(1); filter: none; clip-path: none; }
+  60% { transform: translate(-2px, 2px); }
+  70% { transform: translate(2px, -2px); }
+  100% { transform: translate(0) skew(0) scale(1); filter: none; clip-path: none; }
+}
+
+.animate-screen-tear {
+  animation: screen-tear 0.5s ease-in-out both;
+}
+
+.glass-panel {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(0, 0, 0, 0.6) 100%);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
 .main-background {
   background-image: url("/images/escape_room_main.png");
   background-size: cover;

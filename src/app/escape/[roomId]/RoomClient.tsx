@@ -9,9 +9,10 @@ import { writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
 import { Room } from '@/types/room';
 import { verifyAnswer } from '@/app/actions/game';
-import TypewriterEffect from '@/components/TypewriterEffect';
 import ComboLockInput from '@/components/ComboLockInput';
 import SpeedrunTimer from '@/components/SpeedrunTimer';
+import GlitchText from '@/components/GlitchText';
+import ParticleBackground from '@/components/ParticleBackground';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
 const blackHanSans = Black_Han_Sans({
@@ -220,7 +221,9 @@ export default function RoomClient({
 	return (
 		<div className="min-h-screen bg-black text-slate-300 selection:bg-emerald-900 font-mono overflow-x-hidden relative">
 			{/* Scanlines Effect */}
-			<div className="fixed inset-0 pointer-events-none z-50 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,#000000_3px)] opacity-10"></div>
+			<div className="fixed inset-0 pointer-events-none z-50 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,#000000_3px)] opacity-10 mix-blend-overlay"></div>
+			
+			<ParticleBackground />
 			
 			<div
 				className="fixed inset-0 z-0 transition-opacity duration-1000"
@@ -247,8 +250,8 @@ export default function RoomClient({
 				</header>
 
 				{/* Main Content Area */}
-				<main className="flex-1 flex flex-col justify-center animate-fade-in-scale">
-					<div className="bg-black/80 backdrop-blur-md border border-slate-800 p-8 md:p-12 rounded-sm shadow-2xl relative overflow-hidden group">
+				<main className="flex-1 flex flex-col justify-center animate-fade-in-scale z-10">
+					<div className="glass-panel p-8 md:p-12 rounded-xl relative overflow-hidden group">
 						{/* Decorative Corner Borders */}
 						<div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-emerald-900/50 group-hover:border-emerald-500/50 transition-colors duration-500"></div>
 						<div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-emerald-900/50 group-hover:border-emerald-500/50 transition-colors duration-500"></div>
@@ -263,7 +266,7 @@ export default function RoomClient({
 								{room.question}
 							</div>
 							<div className="absolute top-0 left-0 w-full h-full pl-6 py-2 whitespace-pre-wrap pointer-events-none">
-								<TypewriterEffect text={room.question} speed={30} />
+								<GlitchText text={room.question} speed={30} />
 							</div>
 						</div>
 
@@ -291,8 +294,8 @@ export default function RoomClient({
 						)}
 
 						{error && (
-							<div className="bg-red-950/20 border border-red-900/50 p-4 mb-8 animate-shake">
-								<p className="text-red-500/90 text-sm tracking-wide font-mono">
+							<div className="glass-panel border-red-900/50 p-4 mb-8 animate-screen-tear">
+								<p className="text-red-500/90 text-sm tracking-wide font-mono animate-glitch">
 									[ERROR]: {error}
 								</p>
 							</div>
