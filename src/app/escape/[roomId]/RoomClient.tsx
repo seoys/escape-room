@@ -11,6 +11,7 @@ import { Room } from '@/types/room';
 import { verifyAnswer } from '@/app/actions/game';
 import TypewriterEffect from '@/components/TypewriterEffect';
 import ComboLockInput from '@/components/ComboLockInput';
+import SpeedrunTimer from '@/components/SpeedrunTimer';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
 const blackHanSans = Black_Han_Sans({
@@ -34,6 +35,7 @@ export default function RoomClient({
 	const {
 		currentRoom,
 		hintsRemaining,
+		hintsUsed,
 		consumeHint,
 		completeRoom,
 		setCurrentRoom,
@@ -115,7 +117,9 @@ export default function RoomClient({
 		if (!startTime) return null;
 
 		const diff = Date.now() - new Date(startTime).getTime();
-		return Math.max(0, Math.floor(diff / 1000));
+		const realSeconds = Math.max(0, Math.floor(diff / 1000));
+		const penaltySeconds = (hintsUsed ?? 0) * 180;
+		return realSeconds + penaltySeconds;
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -236,6 +240,7 @@ export default function RoomClient({
 						<span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
 						<span className="text-xs tracking-[0.2em] uppercase">System Online</span>
 					</div>
+					<SpeedrunTimer />
 					<div className="text-xs text-slate-600 tracking-widest">
 						STAGE_{roomId.toString().padStart(2, '0')}/{TOTAL_ROOMS}
 					</div>

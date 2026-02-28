@@ -13,6 +13,7 @@ export interface Room {
 export interface GameState {
 	currentRoom: number;
 	hintsRemaining: number;
+	hintsUsed: number;
 	completedRooms: number[];
 	playerName: string;
 	startTime?: Date;

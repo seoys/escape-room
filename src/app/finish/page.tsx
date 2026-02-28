@@ -6,12 +6,13 @@ import { useEffect, useState } from 'react';
 import { fetchLeaderboardSessions } from '@/lib/api/redisClient';
 
 export default function FinishPage() {
-	const { startTime, endTime } = useGameStore();
+	const { startTime, endTime, hintsUsed } = useGameStore();
 	const [playerName, setPlayerName] = useState('');
 	const [topUsers, setTopUsers] = useState<
 		{ name: string; seconds: number }[]
 	>([]);
 	const [timeLabel, setTimeLabel] = useState('시간 정보 없음');
+	const [penaltyLabel, setPenaltyLabel] = useState('');
 	const [leaderboardError, setLeaderboardError] = useState<string | null>(
 		null,
 	);
@@ -47,13 +48,25 @@ export default function FinishPage() {
 
 		if (storedStart && storedEnd) {
 			const diff = storedEnd - storedStart;
-			const minutes = Math.floor(diff / 60000);
-			const seconds = Math.floor((diff % 60000) / 1000);
+			const realSeconds = Math.floor(diff / 1000);
+			const usedHints =
+				hintsUsed ??
+				(localStorage.getItem('hintsUsed')
+					? parseInt(localStorage.getItem('hintsUsed') as string, 10)
+					: 0);
+			const penaltySeconds = usedHints * 180;
+			const totalSeconds = realSeconds + penaltySeconds;
+
+			const minutes = Math.floor(totalSeconds / 60);
+			const seconds = totalSeconds % 60;
 			setTimeLabel(`${minutes}분 ${seconds}초`);
+			if (penaltySeconds > 0) {
+				setPenaltyLabel(`(+ 힌트 페널티 ${Math.floor(penaltySeconds / 60)}분 ${penaltySeconds % 60 > 0 ? `${penaltySeconds % 60}초` : ''})`);
+			}
 		}
 
 		fetchTopUsers();
-	}, [endTime, startTime]);
+	}, [endTime, startTime, hintsUsed]);
 
 	return (
 		<main className="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -76,8 +89,13 @@ export default function FinishPage() {
 						<p className="text-lg font-medium text-orange-900">
 							이름: {playerName}
 						</p>
-						<p className="text-lg font-medium text-orange-900">
-							총 소요 시간: {timeLabel}
+						<p className="text-lg font-medium text-orange-900 mt-2 flex flex-col items-center">
+							<span>최종 소요 시간: {timeLabel}</span>
+							{penaltyLabel && (
+								<span className="text-sm text-red-600 font-bold mt-1">
+									{penaltyLabel}
+								</span>
+							)}
 						</p>
 					</div>
 					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner">

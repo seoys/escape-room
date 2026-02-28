@@ -13,6 +13,16 @@ const getInitialHintsRemaining = () => {
 	if (Number.isFinite(stored) && stored >= 0) return stored;
 	return 3;
 };
+
+const getInitialHintsUsed = () => {
+	if (typeof window === 'undefined') return 0;
+	const stored = parseInt(
+		(localStorage.getItem('hintsUsed') as string) ?? '',
+		10,
+	);
+	if (Number.isFinite(stored) && stored >= 0) return stored;
+	return 0;
+};
 interface GameStore extends GameState {
 	initGame: () => Promise<void>;
 	setCurrentRoom: (roomId: number) => void;
@@ -26,6 +36,7 @@ interface GameStore extends GameState {
 const store = set => ({
 	currentRoom: 1,
 	hintsRemaining: getInitialHintsRemaining(),
+	hintsUsed: getInitialHintsUsed(),
 	completedRooms: [],
 	startTime: undefined,
 	endTime: undefined,
@@ -44,9 +55,11 @@ const store = set => ({
 		localStorage.setItem('userPlatform', browserInfo.platform);
 		localStorage.setItem('startTime', new Date().toISOString());
 		localStorage.setItem('hintsRemaining', '3');
+		localStorage.setItem('hintsUsed', '0');
 		set({
 			currentRoom: 1,
 			hintsRemaining: 3,
+			hintsUsed: 0,
 			completedRooms: [],
 			startTime: new Date(),
 			endTime: undefined,
@@ -75,10 +88,12 @@ const store = set => ({
 	consumeHint: () =>
 		set((state: GameStore) => {
 			const nextHints = Math.max(0, state.hintsRemaining - 1);
+			const nextHintsUsed = state.hintsUsed + 1;
 			if (typeof window !== 'undefined') {
 				localStorage.setItem('hintsRemaining', nextHints.toString());
+				localStorage.setItem('hintsUsed', nextHintsUsed.toString());
 			}
-			return { hintsRemaining: nextHints };
+			return { hintsRemaining: nextHints, hintsUsed: nextHintsUsed };
 		}),
 
 	completeRoom: (roomId: number) =>
