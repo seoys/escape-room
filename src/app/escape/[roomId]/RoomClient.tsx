@@ -10,6 +10,7 @@ import { StoredSession } from '@/types/session';
 import { Room } from '@/types/room';
 import { verifyAnswer } from '@/app/actions/game';
 import TypewriterEffect from '@/components/TypewriterEffect';
+import ComboLockInput from '@/components/ComboLockInput';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
 const blackHanSans = Black_Han_Sans({
@@ -41,7 +42,7 @@ export default function RoomClient({
 	const answerInputRef = useRef<HTMLInputElement>(null);
 	const initialRoomRef = useRef(currentRoom);
 	const [answer, setAnswer] = useState('');
-	const [showHint, setShowHint] = useState(false);
+	const [shownHintsCount, setShownHintsCount] = useState(0);
 	const [error, setError] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
 	const [hydratedRoom, setHydratedRoom] = useState<number | null>(null);
@@ -72,6 +73,11 @@ export default function RoomClient({
 			router.replace(`/escape/${hydratedRoom}`);
 			return;
 		}
+
+		// Reset local state when navigated to a different room ID
+		setShownHintsCount(0);
+		setAnswer('');
+		setError('');
 
 		const persistRoomEntry = async () => {
 			try {
@@ -171,11 +177,14 @@ export default function RoomClient({
 		}
 	};
 
+	const hintArray = Array.isArray(room.hint) ? room.hint : [room.hint];
+	const canShowMoreHints = shownHintsCount < hintArray.length;
+
 	const handleHint = () => {
-		if (hintsRemaining > 0) {
+		if (hintsRemaining > 0 && canShowMoreHints) {
 			const nextHints = Math.max(0, hintsRemaining - 1);
 			consumeHint();
-			setShowHint(true);
+			setShownHintsCount(prev => prev + 1);
 
 			const playerName = localStorage.getItem('playerName') || '';
 			if (playerName) {
@@ -259,12 +268,14 @@ export default function RoomClient({
 							</div>
 						)}
 
-						{showHint && (
-							<div className="bg-amber-950/20 border-l-2 border-amber-600/50 p-4 mb-8 animate-fade-in-scale">
-								<p className="text-amber-500/90 text-sm tracking-wide">
-									<span className="font-bold mr-2">[HINT LOG]:</span>
-									{room.hint}
-								</p>
+						{shownHintsCount > 0 && (
+							<div className="bg-amber-950/20 border-l-2 border-amber-600/50 p-4 mb-8 animate-fade-in-scale space-y-3">
+								{hintArray.slice(0, shownHintsCount).map((h, i) => (
+									<p key={i} className="text-amber-500/90 text-sm tracking-wide">
+										<span className="font-bold mr-2 text-amber-600">[{hintArray.length > 1 ? `HINT LOG ${i + 1}` : 'HINT LOG'}]:</span>
+										{h}
+									</p>
+								))}
 							</div>
 						)}
 
@@ -277,18 +288,39 @@ export default function RoomClient({
 						)}
 
 						<form onSubmit={handleSubmit} className="space-y-8">
-							<div className="relative group/input">
-								<div className="absolute inset-x-0 bottom-0 h-[1px] bg-slate-700 group-hover/input:bg-emerald-500/50 transition-colors duration-300"></div>
-								<input
-									ref={answerInputRef}
-									type="text"
+							{room.inputType === 'combo-lock' ? (
+								<ComboLockInput
+									length={room.comboLength || 4}
 									value={answer}
-									onChange={e => setAnswer(e.target.value)}
-									placeholder="ENTER PASSCODE..."
-									className="w-full bg-transparent py-4 text-2xl md:text-3xl text-emerald-500 placeholder-slate-800 text-center focus:outline-none font-mono tracking-[0.2em] uppercase"
-									autoComplete="off"
+									onChange={setAnswer}
+									disabled={isSubmitting}
+									onComplete={() => {
+										// Optional auto-submit can be triggered here if desired
+										// handleSubmit(new Event('submit') as unknown as React.FormEvent);
+									}}
 								/>
-							</div>
+							) : (
+								<div className="relative group/input">
+									<div className="absolute inset-x-0 bottom-0 h-[1px] bg-slate-700 group-hover/input:bg-emerald-500/50 transition-colors duration-300"></div>
+									<input
+										ref={answerInputRef}
+										type={room.inputType === 'number' ? 'number' : room.inputType === 'password' ? 'password' : 'text'}
+										inputMode={room.inputType === 'number' ? 'numeric' : 'text'}
+										value={answer}
+										onChange={e => setAnswer(e.target.value)}
+										onKeyDown={e => {
+											// Enter 키 입력 시 폼 제출 보장
+											if (e.key === 'Enter') {
+												e.preventDefault();
+												handleSubmit(e as unknown as React.FormEvent);
+											}
+										}}
+										placeholder="ENTER PASSCODE..."
+										className="w-full bg-transparent py-4 text-2xl md:text-3xl text-emerald-500 placeholder-slate-800 text-center focus:outline-none font-mono tracking-[0.2em] uppercase transition-all duration-300 focus:scale-105"
+										autoComplete="off"
+									/>
+								</div>
+							)}
 
 							<div className="flex flex-col md:flex-row gap-4 pt-8">
 								<button
@@ -302,9 +334,9 @@ export default function RoomClient({
 								<button
 									type="button"
 									onClick={handleHint}
-									disabled={hintsRemaining === 0 || showHint}
+									disabled={hintsRemaining === 0 || !canShowMoreHints}
 									className={`px-8 py-3 text-sm transition-all uppercase tracking-widest border ${
-										hintsRemaining > 0 && !showHint
+										hintsRemaining > 0 && canShowMoreHints
 											? 'text-amber-600 border-amber-900/30 hover:bg-amber-900/10 hover:border-amber-700'
 											: 'text-slate-700 border-transparent cursor-not-allowed'
 									}`}

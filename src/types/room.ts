@@ -3,9 +3,11 @@ export interface Room {
 	title: string;
 	type: string;
 	question: string;
-	answer: string;
-	hint: string;
+	answer: string | string[];
+	hint: string | string[];
 	difficulty: number;
+	inputType?: 'text' | 'number' | 'password' | 'choice' | 'combo-lock';
+	comboLength?: number;
 }
 
 export interface GameState {

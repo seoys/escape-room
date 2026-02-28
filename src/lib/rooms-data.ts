@@ -11,7 +11,10 @@ export const rooms: Room[] = [
 		question:
 			'[CAS FILE #001]\n현장에 남겨진 첫 번째 쪽지. 누군가 급하게 쓴 흔적이 역력하다.\n\n"모든 것은 끝에서 시작된다."\n\nSTART - ? - END\n\n연결고리가 되는 3글자 코드는 무엇인가?',
 		answer: 'ART',
-		hint: 'START의 끝(ART)이 END의 시작이 됩니다. 단어 속에 답이 있습니다.',
+		hint: [
+			'START의 끝이 무엇인지, END의 시작이 무엇인지 단어 스펠링을 잘 보세요.',
+			'START는 ART로 끝나고, END는 E로 시작합니다. 연결하면 정답인 3글자가 됩니다.'
+		],
 		type: '관찰',
 		difficulty: 1,
 	},
@@ -21,7 +24,10 @@ export const rooms: Room[] = [
 		question:
 			'[용의자 심문]\n용의자 A, B, C 중 진범은 한 명이며, 셋 중 한 명만 진실을 말하고 있다.\n\nA: "나는 범인이 아니다."\nB: "범인은 C다."\nC: "B는 거짓말쟁이다."\n\n진범은 누구인가? (대문자 1글자)',
 		answer: 'A',
-		hint: '각각을 범인으로 가정하고 참/거짓을 판별해보세요.\n만약 A가 범인이라면?\nA의 말(거짓), B의 말(거짓), C의 말(참). -> 진실 1명 조건 만족.',
+		hint: [
+			'세 사람 중 진짜 범인 1명, 진실을 말하는 사람 1명뿐입니다. 각각 범인이라고 가정해보세요.',
+			'만약 A가 범인이라면? A의 말(거짓), B의 말(거짓), C의 말(참)이 되어 "진실 1명" 조건에 부합합니다.'
+		],
 		type: '논리',
 		difficulty: 1,
 	},
@@ -34,6 +40,8 @@ export const rooms: Room[] = [
 		hint: '종이에 숫자를 쓰고 180도 뒤집어 보세요. 순서도 반대가 됩니다. (4->h, 0->O...)',
 		type: '관찰',
 		difficulty: 2,
+		inputType: 'combo-lock',
+		comboLength: 4,
 	},
 	{
 		id: 4,
@@ -68,6 +76,7 @@ export const rooms: Room[] = [
 		hint: '6번 치는 동안 "간격"은 5번입니다. 즉 간격당 2초가 걸리죠. 12시를 알리려면 간격이 몇 번 필요할까요?',
 		type: '함정 수학',
 		difficulty: 3,
+		inputType: 'number',
 	},
 	{
 		id: 7,
@@ -85,7 +94,10 @@ export const rooms: Room[] = [
 		question:
 			'[탈출 계획]\n죄수는 높이 30m의 벽을 오르려 한다.\n낮에는 3m를 올라가고, 밤에는 잠을 자다 2m 미끄러져 내려온다.\n그가 벽의 꼭대기(30m)에 도달하려면 며칠이 걸리는가? (숫자만 입력)',
 		answer: '28',
-		hint: '마지막 날을 주의하세요. 27일이 지나면 27m에 도달해 있습니다. 다음 날 낮에 3m를 오르면 정상에 도착하므로 미끄러지지 않습니다.',
+		hint: [
+			'하루 종일 지났을 때의 차이(3m-2m = 1m)로만 계산하면 함정에 빠집니다. 정상(30m)에 올라가면 미끄러지지 않습니다.',
+			'낮에 3m를 한 번에 올라갈 수 있으니, 27m 지점까지만 도달하면 다음 날 낮에 바로 탈출합니다.'
+		],
 		type: '함정 수학',
 		difficulty: 3,
 	},
@@ -98,13 +110,15 @@ export const rooms: Room[] = [
 		hint: '앞의 숫자를 소리내어 읽으세요 (개미 수열). "1이 1개" -> 11, "1이 2개" -> 21...',
 		type: '수열',
 		difficulty: 4,
+		inputType: 'combo-lock',
+		comboLength: 6,
 	},
 	{
 		id: 10,
 		title: '미안한 과일',
 		question:
 			'[넌센스 퀴즈]\n세상에서 가장 미안해하는 과일은 무엇인가?\n(한글 2글자)',
-		answer: '사과',
+		answer: ['사과', 'apple'],
 		hint: '잘못했을 때 하는 말과 이름이 같아요.',
 		type: '넌센스',
 		difficulty: 1,
@@ -152,6 +166,8 @@ export const rooms: Room[] = [
 		hint: '규칙은 (차)(합)(곱) 입니다. 7-3=4, 7+3=10, 7*3=21.',
 		type: '패턴',
 		difficulty: 5,
+		inputType: 'combo-lock',
+		comboLength: 5,
 	},
 	{
 		id: 15,
@@ -256,7 +272,7 @@ export const rooms: Room[] = [
 		title: '시간 계산',
 		question:
 			'[시계 보기]\n지금 시각은 1시 50분이다.\n20분 후는 몇 시 몇 분인가? (예: 12시30분)',
-		answer: '2시10분',
+		answer: ['2시10분', '2:10'],
 		hint: '50분에 10분을 더하면 2시가 되고, 나머지 10분이 더 지납니다.',
 		type: '논리',
 		difficulty: 2,
@@ -266,7 +282,7 @@ export const rooms: Room[] = [
 		title: '요일 찾기',
 		question:
 			'[달력 보기]\n어느 해 1월 1일이 "일요일"이었다.\n그렇다면 일주일 뒤인 1월 8일은 무슨 요일인가? (요일만 입력. 예: 월요일)',
-		answer: '일요일',
+		answer: ['일요일', '일'],
 		hint: '일주일은 7일입니다. 7일 후는 같은 요일이 돌아옵니다.',
 		type: '논리',
 		difficulty: 1,
