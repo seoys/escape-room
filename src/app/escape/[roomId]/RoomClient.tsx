@@ -252,8 +252,14 @@ export default function RoomClient({
 							{room.title}
 						</h2>
 
-						<div className="mb-12 min-h-[120px] text-lg md:text-xl leading-relaxed text-slate-300 border-l-4 border-slate-700 pl-6 py-2">
-							<TypewriterEffect text={room.question} speed={30} />
+						<div className="relative mb-12 text-lg md:text-xl leading-relaxed text-slate-300 border-l-4 border-slate-700">
+							{/* 보이지 않는 전체 텍스트로 최종 높이를 미리 확보 (레이아웃 시프트 방지) */}
+							<div className="invisible pl-6 py-2 whitespace-pre-wrap select-none" aria-hidden="true">
+								{room.question}
+							</div>
+							<div className="absolute top-0 left-0 w-full h-full pl-6 py-2 whitespace-pre-wrap pointer-events-none">
+								<TypewriterEffect text={room.question} speed={30} />
+							</div>
 						</div>
 
 						{roomId === 10 && (
