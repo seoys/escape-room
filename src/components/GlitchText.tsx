@@ -14,7 +14,6 @@ export default function GlitchText({ text, speed = 30 }: GlitchTextProps) {
 
 	useEffect(() => {
 		let currentLength = 0;
-		let scrambleInterval: NodeJS.Timeout;
 
 		const scramble = () => {
 			if (currentLength >= text.length) {
@@ -37,7 +36,7 @@ export default function GlitchText({ text, speed = 30 }: GlitchTextProps) {
 			currentLength += 1/2; // speed controls how fast real chars reveal
 		};
 
-		scrambleInterval = setInterval(scramble, speed);
+		const scrambleInterval = setInterval(scramble, speed);
 
 		return () => clearInterval(scrambleInterval);
 	}, [text, speed]);
