@@ -219,6 +219,12 @@ export default function RoomClient({
 		}
 	};
 
+	const handleGiveUp = () => {
+		if (window.confirm('정말 진행을 포기하시겠습니까? 처음 화면으로 돌아갑니다.')) {
+			router.push('/');
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-black text-slate-300 selection:bg-emerald-900 font-mono overflow-x-hidden relative">
 			{/* Scanlines Effect */}
@@ -343,7 +349,15 @@ export default function RoomClient({
 									onClick={handleBack}
 									className="px-8 py-3 text-slate-500 text-sm hover:text-slate-300 transition-colors uppercase tracking-widest border border-transparent hover:border-slate-800"
 								>
-									Aborted
+									{roomId === 1 ? 'Home' : 'Previous'}
+								</button>
+								
+								<button
+									type="button"
+									onClick={handleGiveUp}
+									className="px-8 py-3 text-red-800/80 text-sm hover:text-red-500 transition-colors uppercase tracking-widest border border-transparent hover:border-red-900/30 hover:bg-red-900/10"
+								>
+									Give Up
 								</button>
 								
 								<button
