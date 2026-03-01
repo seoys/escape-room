@@ -109,7 +109,8 @@ export default function RoomClient({
 		};
 
 		persistRoomEntry();
-	}, [hydratedRoom, roomId, router, hintsRemaining]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [hydratedRoom, roomId, router]);
 
 	if (isLoading) return <div className="text-white">Loading...</div>;
 
