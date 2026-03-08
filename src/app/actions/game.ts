@@ -1,9 +1,15 @@
 'use server';
 
-import { rooms } from '@/lib/rooms-data';
+import { getRoomsForAgeGroup } from '@/lib/room-selector';
+import { AgeGroup } from '@/types/room';
 
-export async function verifyAnswer(roomId: number, answer: string): Promise<boolean> {
-  const room = rooms.find(r => r.id === roomId);
+export async function verifyAnswer(
+  roomId: number,
+  answer: string,
+  ageGroup: AgeGroup = 'adult',
+): Promise<boolean> {
+  const selectedRooms = getRoomsForAgeGroup(ageGroup);
+  const room = selectedRooms[roomId - 1];
   if (!room) return false;
   
   // Normalize string: lower case and completely remove all whitespaces/spaces

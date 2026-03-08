@@ -6,10 +6,14 @@ import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
 import { readSession, writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
+import { getAgeGroupFromAge } from '@/lib/room-selector';
+import { TOTAL_ROOMS } from '@/lib/constants';
 
 export default function StartPage() {
 	const answerInputRef = useRef<HTMLInputElement>(null);
 	const [name, setName] = useState('');
+	const [gender, setGender] = useState<'male' | 'female' | 'other'>('male');
+	const [age, setAge] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -36,6 +40,14 @@ export default function StartPage() {
 			if (storedName) {
 				setName(storedName);
 			}
+			const storedGender = localStorage.getItem('playerGender');
+			if (storedGender === 'male' || storedGender === 'female' || storedGender === 'other') {
+				setGender(storedGender);
+			}
+			const storedAge = localStorage.getItem('playerAge');
+			if (storedAge) {
+				setAge(storedAge);
+			}
 
 			setIsLoading(false);
 		};
@@ -48,17 +60,29 @@ export default function StartPage() {
 			setErrorMessage('이름을 입력해주세요. :)');
 			return;
 		}
+		const parsedAge = parseInt(age, 10);
+		if (!Number.isFinite(parsedAge) || parsedAge < 8 || parsedAge > 100) {
+			setErrorMessage('나이는 8세 이상 100세 이하로 입력해주세요.');
+			return;
+		}
 
 		setErrorMessage(null);
 		setIsSubmitting(true);
 
 		const trimmedName = name.trim();
-		const sessionKey = `escape_${trimmedName}`;
+		const ageGroup = getAgeGroupFromAge(parsedAge);
+		const playerKey = `escape_${trimmedName}_${gender}_${parsedAge}`;
 
 		try {
 			await useGameStore.getState().setPlayerName(trimmedName);
+			localStorage.setItem('playerName', trimmedName);
+			localStorage.setItem('playerGender', gender);
+			localStorage.setItem('playerAge', parsedAge.toString());
+			localStorage.setItem('playerAgeGroup', ageGroup);
+			localStorage.setItem('playerKey', playerKey);
+			document.cookie = `player_age_group=${ageGroup}; path=/; max-age=2592000`;
 
-			const existingSession = await readSession(trimmedName);
+			const existingSession = await readSession(playerKey);
 
 			if (existingSession) {
 				if (
@@ -69,7 +93,7 @@ export default function StartPage() {
 				}
 
 				const isSameUser =
-					existingSession.name === sessionKey &&
+					existingSession.name === playerKey &&
 					(existingSession.host ===
 						localStorage.getItem('userHost') ||
 						existingSession.userAgent ===
@@ -90,7 +114,7 @@ export default function StartPage() {
 						'이미 존재하는 정보입니다. 마지막 방에서 게임을 진행합니다.',
 					);
 
-					const nextRoomId = Number(existingSession.roomId) || 1;
+					const nextRoomId = Math.min(TOTAL_ROOMS, Number(existingSession.roomId) || 1);
 					setCurrentRoom(nextRoomId);
 					router.push(`/escape/${nextRoomId}`);
 					return;
@@ -98,7 +122,11 @@ export default function StartPage() {
 			}
 
 			const payload: StoredSession = {
-				name: sessionKey,
+				name: playerKey,
+				displayName: trimmedName,
+				gender,
+				age: parsedAge,
+				ageGroup,
 				host: localStorage.getItem('userHost'),
 				userAgent: localStorage.getItem('userAgent'),
 				platform: localStorage.getItem('userPlatform'),
@@ -107,7 +135,10 @@ export default function StartPage() {
 				hintsRemaining: 3,
 			};
 
-			await writeSession(trimmedName, payload);
+			await writeSession(playerKey, payload);
+			localStorage.setItem('score', '0');
+			localStorage.setItem('combo', '0');
+			localStorage.setItem('bestCombo', '0');
 
 			setHintsRemaining(3);
 			setCurrentRoom(1);
@@ -142,6 +173,24 @@ export default function StartPage() {
 						onChange={e => setName(e.target.value)}
 						ref={answerInputRef}
 						placeholder="이름 입력"
+						className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+					/>
+					<select
+						value={gender}
+						onChange={e => setGender(e.target.value as 'male' | 'female' | 'other')}
+						className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 text-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+					>
+						<option value="male">남성</option>
+						<option value="female">여성</option>
+						<option value="other">기타</option>
+					</select>
+					<input
+						type="number"
+						min={8}
+						max={100}
+						value={age}
+						onChange={e => setAge(e.target.value)}
+						placeholder="나이 입력"
 						className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
 					/>
 					{errorMessage ? (

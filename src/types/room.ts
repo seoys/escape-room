@@ -1,3 +1,5 @@
+export type AgeGroup = 'teen' | 'adult' | 'senior';
+
 export interface Room {
 	id: number;
 	title: string;
@@ -16,6 +18,9 @@ export interface GameState {
 	hintsUsed: number;
 	completedRooms: number[];
 	playerName: string;
+	playerGender?: string;
+	playerAge?: number;
+	ageGroup?: AgeGroup;
 	startTime?: Date;
 	endTime?: Date;
 	host: string;

@@ -5,6 +5,9 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
 const buildUrl = (path: string) =>
 	apiBaseUrl ? `${apiBaseUrl}${path}` : null;
 
+const resolveRedisKey = (value: string) =>
+	value.startsWith('escape_') ? value : `escape_${value}`;
+
 const parseJsonSafe = <T>(value: string | null | undefined): T | null => {
 	if (!value) return null;
 	try {
@@ -44,9 +47,10 @@ const request = async <T>(path: string, init?: RequestInit) => {
 
 export const readSession = async (playerName: string) => {
 	if (!playerName || !apiBaseUrl?.trim()) return null;
+	const redisKey = resolveRedisKey(playerName);
 
 	const response = await request<{ result?: string }>(
-		`/v1/redis/escape_${playerName}`,
+		`/v1/redis/${redisKey}`,
 	);
 
 	return parseJsonSafe<StoredSession>(response?.result);
@@ -57,10 +61,11 @@ export const writeSession = async (
 	payload: StoredSession,
 ) => {
 	if (!playerName || !apiBaseUrl?.trim()) return false;
+	const redisKey = resolveRedisKey(playerName);
 
 	try {
 		const result = await request(
-			`/v1/redis/escape_${playerName}?data=${encodeURIComponent(JSON.stringify(payload))}`,
+			`/v1/redis/${redisKey}?data=${encodeURIComponent(JSON.stringify(payload))}`,
 			{ method: 'POST' },
 		);
 

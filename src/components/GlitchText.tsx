@@ -9,7 +9,7 @@ interface GlitchTextProps {
 	speed?: number;
 }
 
-export default function GlitchText({ text, speed = 30 }: GlitchTextProps) {
+export default function GlitchText({ text, speed = 20 }: GlitchTextProps) {
 	const [displayText, setDisplayText] = useState('');
 
 	useEffect(() => {
@@ -33,7 +33,7 @@ export default function GlitchText({ text, speed = 30 }: GlitchTextProps) {
 				}
 			}
 			setDisplayText(nextText);
-			currentLength += 1/2; // speed controls how fast real chars reveal
+			currentLength += 1; // reveal one real char per tick
 		};
 
 		const scrambleInterval = setInterval(scramble, speed);

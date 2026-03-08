@@ -1,6 +1,12 @@
-import { rooms } from '@/lib/rooms-data';
 import { notFound, redirect } from 'next/navigation';
 import RoomClient from './RoomClient';
+import { cookies } from 'next/headers';
+import {
+  AGE_GROUP_COOKIE_KEY,
+  getRoomsForAgeGroup,
+  normalizeAgeGroup,
+} from '@/lib/room-selector';
+import { TOTAL_ROOMS } from '@/lib/constants';
 
 
 interface PageProps {
@@ -10,17 +16,21 @@ interface PageProps {
 export default async function RoomPage({ params }: PageProps) {
   const resolvedParams = await params;
   const parsedRoomId = parseInt(resolvedParams.roomId, 10);
+  const cookieStore = await cookies();
+  const ageGroup = normalizeAgeGroup(cookieStore.get(AGE_GROUP_COOKIE_KEY)?.value);
+  const selectedRooms = getRoomsForAgeGroup(ageGroup);
   
   if (!Number.isFinite(parsedRoomId) || parsedRoomId < 1) {
     redirect('/escape/1');
   }
 
-  const room = rooms.find(r => r.id === parsedRoomId);
+  if (parsedRoomId > TOTAL_ROOMS) {
+    redirect('/escape/1');
+  }
+
+  const room = selectedRooms[parsedRoomId - 1];
 
   if (!room) {
-    if (parsedRoomId > rooms.length) {
-       redirect('/escape/1');
-    }
     notFound(); 
   }
 
@@ -31,14 +41,17 @@ export default async function RoomPage({ params }: PageProps) {
     question: room.question,
     hint: room.hint,
     type: room.type,
-    difficulty: room.difficulty
+    difficulty: room.difficulty,
+    inputType: room.inputType,
+    comboLength: room.comboLength
   };
-  const isLastRoom = room.id === rooms[rooms.length - 1]?.id;
+  const isLastRoom = parsedRoomId === TOTAL_ROOMS;
 
   return (
     <RoomClient 
       room={sanitizedRoom} 
-      roomId={room.id}
+      roomId={parsedRoomId}
+      ageGroup={ageGroup}
       isLastRoom={isLastRoom}
     />
   );

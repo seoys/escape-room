@@ -1,1 +1,1 @@
-export const TOTAL_ROOMS = 25;
+export const TOTAL_ROOMS = 30;

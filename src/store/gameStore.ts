@@ -56,6 +56,9 @@ const store = set => ({
 		localStorage.setItem('startTime', new Date().toISOString());
 		localStorage.setItem('hintsRemaining', '3');
 		localStorage.setItem('hintsUsed', '0');
+		localStorage.setItem('score', '0');
+		localStorage.setItem('combo', '0');
+		localStorage.setItem('bestCombo', '0');
 		set({
 			currentRoom: 1,
 			hintsRemaining: 3,

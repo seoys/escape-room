@@ -9,10 +9,13 @@ export default function FinishPage() {
 	const { startTime, endTime, hintsUsed } = useGameStore();
 	const [playerName, setPlayerName] = useState('');
 	const [topUsers, setTopUsers] = useState<
-		{ name: string; seconds: number }[]
+		{ name: string; seconds: number; ageGroup?: string }[]
 	>([]);
 	const [timeLabel, setTimeLabel] = useState('시간 정보 없음');
 	const [penaltyLabel, setPenaltyLabel] = useState('');
+	const [scoreLabel, setScoreLabel] = useState('0');
+	const [comboLabel, setComboLabel] = useState('0');
+	const [achievements, setAchievements] = useState<string[]>([]);
 	const [leaderboardError, setLeaderboardError] = useState<string | null>(
 		null,
 	);
@@ -23,8 +26,9 @@ export default function FinishPage() {
 				const sessions = await fetchLeaderboardSessions();
 				setTopUsers(
 					sessions.slice(0, 5).map(session => ({
-						name: session.name,
+						name: session.displayName || session.name.replace('escape_', ''),
 						seconds: session.seconds ?? 0,
+						ageGroup: session.ageGroup,
 					})),
 				);
 			} catch (error) {
@@ -63,6 +67,19 @@ export default function FinishPage() {
 			if (penaltySeconds > 0) {
 				setPenaltyLabel(`(+ 힌트 페널티 ${Math.floor(penaltySeconds / 60)}분 ${penaltySeconds % 60 > 0 ? `${penaltySeconds % 60}초` : ''})`);
 			}
+
+			const finalScore = parseInt(localStorage.getItem('score') ?? '0', 10);
+			const bestCombo = parseInt(localStorage.getItem('bestCombo') ?? '0', 10);
+			setScoreLabel(`${Number.isFinite(finalScore) ? finalScore : 0}`);
+			setComboLabel(`${Number.isFinite(bestCombo) ? bestCombo : 0}`);
+
+			const unlocked: string[] = ['완주자: 모든 방 탈출 성공'];
+			if (usedHints === 0) unlocked.push('무힌트 클리어: 힌트 없이 완료');
+			if ((Number.isFinite(bestCombo) ? bestCombo : 0) >= 5) {
+				unlocked.push('연쇄 해커: 콤보 5 이상 달성');
+			}
+			if (totalSeconds <= 20 * 60) unlocked.push('스피드 러너: 20분 이내 클리어');
+			setAchievements(unlocked);
 		}
 
 		fetchTopUsers();
@@ -97,6 +114,28 @@ export default function FinishPage() {
 								</span>
 							)}
 						</p>
+						<p className="text-lg font-medium text-orange-900 mt-2">
+							최종 점수: {scoreLabel}
+						</p>
+						<p className="text-lg font-medium text-orange-900 mt-1">
+							최고 콤보: x{comboLabel}
+						</p>
+					</div>
+
+					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner text-left">
+						<h2 className="text-2xl font-bold text-orange-800 mb-3 text-center">
+							🎖️ 업적
+						</h2>
+						<ul className="space-y-2">
+							{achievements.map(item => (
+								<li
+									key={item}
+									className="bg-white/80 rounded-lg px-3 py-2 text-orange-900 text-sm"
+								>
+									{item}
+								</li>
+							))}
+						</ul>
 					</div>
 					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner">
 						<h2 className="text-2xl font-bold text-orange-800 mb-4">
@@ -121,8 +160,13 @@ export default function FinishPage() {
 												{index > 2 && '🎖️'}
 											</span>
 											<span className="font-medium">
-												{user.name.replace('escape_', '')}
+												{user.name}
 											</span>
+											{user.ageGroup && (
+												<span className="text-xs text-orange-500">
+													({user.ageGroup})
+												</span>
+											)}
 										</div>
 										<span className="text-gray-600">
 											{Math.floor(user.seconds / 60)}분{' '}
