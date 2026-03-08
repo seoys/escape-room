@@ -4,8 +4,8 @@ import { cookies } from 'next/headers';
 import {
   AGE_GROUP_COOKIE_KEY,
   getRoomsForAgeGroup,
-  normalizeAgeGroup,
 } from '@/lib/room-selector';
+import { normalizeAgeGroup } from '@/lib/age-group';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
 

@@ -1,13 +1,8 @@
 import { rooms } from '@/lib/rooms-data';
 import { AgeGroup, Room } from '@/types/room';
+import { getAgeGroupFromAge, normalizeAgeGroup } from '@/lib/age-group';
 
 export const AGE_GROUP_COOKIE_KEY = 'player_age_group';
-
-export const getAgeGroupFromAge = (age: number): AgeGroup => {
-	if (age <= 19) return 'teen';
-	if (age <= 39) return 'adult';
-	return 'senior';
-};
 
 export const getRoomsForAgeGroup = (ageGroup: AgeGroup): Room[] => {
 	if (ageGroup === 'teen') {
@@ -19,9 +14,4 @@ export const getRoomsForAgeGroup = (ageGroup: AgeGroup): Room[] => {
 	return rooms.filter(room => room.id >= 61 && room.id <= 90);
 };
 
-export const normalizeAgeGroup = (value?: string | null): AgeGroup => {
-	if (value === 'teen' || value === 'adult' || value === 'senior') {
-		return value;
-	}
-	return 'adult';
-};
+export { getAgeGroupFromAge, normalizeAgeGroup };

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
 import { readSession, writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
-import { getAgeGroupFromAge } from '@/lib/room-selector';
+import { getAgeGroupFromAge } from '@/lib/age-group';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
 export default function StartPage() {
