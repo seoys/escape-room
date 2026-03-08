@@ -1,7 +1,6 @@
 'use client';
-import { useGameStore } from '@/store/gameStore';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const KEYHOLE_POSITION = { x: 50, y: 40 };
 const KEYHOLE_RADIUS = 4;
@@ -29,15 +28,11 @@ const isWithinKeyhole = (x: number, y: number) => {
 };
 
 export default function Home() {
-	const { initGame, setPlayerName: setPlayerNameInStore } = useGameStore();
 	const router = useRouter();
 
 	const [keyPosition, setKeyPosition] = useState(INITIAL_KEY_POSITION);
 	const [isDragging, setIsDragging] = useState(false);
 	const [hasUnlocked, setHasUnlocked] = useState(false);
-	const [playerName, setPlayerName] = useState('');
-	const [isStarting, setIsStarting] = useState(false);
-	const [formError, setFormError] = useState<string | null>(null);
 	const [dragPointerId, setDragPointerId] = useState<number | null>(null);
 	const pointerOffsetRef = useRef({ x: 0, y: 0 });
 	const hasUnlockedRef = useRef(false);
@@ -148,28 +143,6 @@ export default function Home() {
 		setKeyPosition(getRandomKeyPosition());
 	}, []);
 
-	const handleNameSubmit = async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		if (!playerName.trim()) {
-			setFormError('이름을 입력해주세요.');
-			return;
-		}
-		setFormError(null);
-		setIsStarting(true);
-
-		try {
-			await initGame();
-			setPlayerNameInStore(playerName.trim());
-			router.push('/escape/1');
-		} catch (error) {
-			console.error('Failed to start game', error);
-			setFormError(
-				'게임을 시작할 수 없습니다. 잠시 후 다시 시도해주세요.',
-			);
-			setIsStarting(false);
-		}
-	};
-
 	return (
 		<main className="main-background">
 			<div
@@ -220,43 +193,21 @@ export default function Home() {
 
 			{hasUnlocked && (
 				<div className="fixed inset-0 z-20 flex items-center justify-center bg-black/70 px-4">
-					<form
-						onSubmit={handleNameSubmit}
-						className="w-full max-w-sm rounded-2xl bg-white/90 p-6 text-left text-gray-900 shadow-2xl backdrop-blur"
-					>
+					<div className="w-full max-w-sm rounded-2xl bg-white/90 p-6 text-left text-gray-900 shadow-2xl backdrop-blur">
 						<h2 className="mb-3 text-lg font-semibold">
-							탐험가의 이름을 알려주세요
+							프로필을 설정하고 시작하세요
 						</h2>
 						<p className="mb-4 text-sm text-gray-600">
-							열쇠가 잠금을 풀었습니다! 방탈출 기록에 남길 이름을
-							입력하면 게임이 시작돼요.
+							열쇠가 잠금을 풀었습니다. 다음 화면에서 이름, 성별, 나이를 입력하면 세대별 문제로 게임이 시작됩니다.
 						</p>
-						<label className="mb-2 block text-sm font-medium text-gray-700">
-							이름
-							<input
-								type="text"
-								value={playerName}
-								onChange={event =>
-									setPlayerName(event.target.value)
-								}
-								className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 outline-none ring-offset-2 focus:ring-2 focus:ring-indigo-500"
-								placeholder="예: 퍼즐러"
-								autoFocus
-							/>
-						</label>
-						{formError ? (
-							<p className="mb-3 text-sm text-red-600">
-								{formError}
-							</p>
-						) : null}
 						<button
-							type="submit"
-							disabled={isStarting}
+							type="button"
+							onClick={() => router.push('/start')}
 							className="mt-2 w-full rounded-lg bg-indigo-600 py-2 text-center text-base font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
 						>
-							{isStarting ? '불러오는 중...' : '시작하기'}
+							프로필 입력으로 이동
 						</button>
-					</form>
+					</div>
 				</div>
 			)}
 		</main>
