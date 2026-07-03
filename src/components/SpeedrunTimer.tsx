@@ -55,13 +55,13 @@ export default function SpeedrunTimer() {
 	const totalTime = elapsedTime + penaltyTime;
 
 	return (
-		<div className="flex flex-col items-center bg-black/60 border border-emerald-900/50 p-3 rounded shadow-lg backdrop-blur-sm">
-			<div className={`text-2xl md:text-3xl text-emerald-400 tracking-wider ${blackHanSans.className}`}>
+		<div className="flex flex-col items-center bg-black/60 border border-[rgba(201,162,75,0.3)] p-3 rounded shadow-lg backdrop-blur-sm">
+			<div className={`text-2xl md:text-3xl text-[#c9a24b] tracking-wider ${blackHanSans.className}`}>
 				{formatTime(totalTime)}
 			</div>
 			{penaltyTime > 0 && (
-				<div className="text-xs text-red-500/90 font-mono tracking-widest mt-1">
-					+ {formatTime(penaltyTime)} PENALTY ({hintsUsed} HINTS)
+				<div className="text-xs text-[#e6a3ab] tracking-widest mt-1" style={{ fontFamily: 'var(--font-serif)' }}>
+					+{formatTime(penaltyTime)} (단서 {hintsUsed}회 사용)
 				</div>
 			)}
 		</div>

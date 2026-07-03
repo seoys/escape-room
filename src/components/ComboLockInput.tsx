@@ -97,11 +97,12 @@ export default function ComboLockInput({
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           disabled={disabled}
-          className="w-12 h-16 sm:w-16 sm:h-20 md:w-20 md:h-24 bg-black/60 border-2 border-slate-700 
-            focus:border-emerald-500 rounded-lg text-3xl md:text-5xl text-center 
-            text-emerald-400 font-mono font-bold shadow-inner 
-            focus:shadow-[0_0_20px_rgba(16,185,129,0.4)] focus:scale-[1.05] 
+          className="w-12 h-16 sm:w-16 sm:h-20 md:w-20 md:h-24 bg-black/60 border-2 border-slate-700
+            focus:border-[#c9a24b] rounded-lg text-3xl md:text-5xl text-center
+            text-[#c9a24b] font-bold shadow-inner
+            focus:shadow-[0_0_20px_rgba(201,162,75,0.4)] focus:scale-[1.05]
             transition-all duration-200 uppercase"
+          style={{ fontFamily: 'var(--font-serif)' }}
           autoComplete="off"
         />
       ))}

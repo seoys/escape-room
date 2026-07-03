@@ -50,7 +50,7 @@ export default function ParticleBackground() {
 
 				ctx.beginPath();
 				ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-				ctx.fillStyle = 'rgba(16, 185, 129, 0.4)'; // emerald-500
+				ctx.fillStyle = 'rgba(201, 162, 75, 0.35)'; // brass gold, dust-mote feel
 				ctx.fill();
 
 				// Draw lines
@@ -61,7 +61,7 @@ export default function ParticleBackground() {
 					ctx.beginPath();
 					ctx.moveTo(p.x, p.y);
 					ctx.lineTo(mouse.x, mouse.y);
-					ctx.strokeStyle = `rgba(16, 185, 129, ${0.4 - dist / 150})`;
+					ctx.strokeStyle = `rgba(201, 162, 75, ${0.35 - dist / 150})`;
 					ctx.stroke();
 				}
                 
@@ -75,7 +75,7 @@ export default function ParticleBackground() {
                         ctx.beginPath();
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(pj.x, pj.y);
-                        ctx.strokeStyle = `rgba(16, 185, 129, ${0.2 - pdist / 500})`; // faint connection
+                        ctx.strokeStyle = `rgba(201, 162, 75, ${0.18 - pdist / 500})`; // faint connection
                         ctx.stroke();
                     }
                 }
