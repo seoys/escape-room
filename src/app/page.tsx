@@ -150,12 +150,12 @@ export default function Home() {
 				className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 text-center text-white"
 				style={{ touchAction: 'none' }}
 			>
-				<div className="mb-8 max-w-md rounded-full bg-black/50 px-6 py-3 text-sm font-medium tracking-wide backdrop-blur">
-					열쇠🔑를 잡고 가운데 열쇠구멍에 끼워보세요.
+				<div className="mb-8 max-w-md rounded-full bg-black/60 border border-[rgba(201,162,75,0.3)] px-6 py-3 text-sm font-medium tracking-wide text-[#e8d9b0] backdrop-blur">
+					낡은 열쇠🔑를 쥐고 자물쇠 구멍에 꽂아보세요.
 				</div>
 
 				<div
-					className={`absolute h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-yellow-300 transition-opacity duration-300 ${
+					className={`absolute h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#c9a24b] transition-opacity duration-300 ${
 						hasUnlocked ? 'opacity-0' : 'opacity-80'
 					}`}
 					style={{
@@ -194,18 +194,18 @@ export default function Home() {
 			{hasUnlocked && (
 				<div className="fixed inset-0 z-20 flex items-center justify-center bg-black/70 px-4">
 					<div className="w-full max-w-sm rounded-2xl bg-white/90 p-6 text-left text-gray-900 shadow-2xl backdrop-blur">
-						<h2 className="mb-3 text-lg font-semibold">
-							프로필을 설정하고 시작하세요
+						<h2 className="mb-3 text-lg font-semibold" style={{ fontFamily: 'var(--font-display)' }}>
+							방문객 기록을 남겨주세요
 						</h2>
 						<p className="mb-4 text-sm text-gray-600">
-							열쇠가 잠금을 풀었습니다. 다음 화면에서 이름, 성별, 나이를 입력하면 세대별 문제로 게임이 시작됩니다.
+							자물쇠가 열렸습니다. 다음 화면에서 이름, 성별, 나이를 남기면 나이대에 맞는 저택의 방들이 준비됩니다.
 						</p>
 						<button
 							type="button"
 							onClick={() => router.push('/start')}
-							className="mt-2 w-full rounded-lg bg-indigo-600 py-2 text-center text-base font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+							className="mt-2 w-full rounded-lg bg-[#c9a24b] py-2 text-center text-base font-semibold text-[#0d0b12] transition hover:bg-[#dcb768] disabled:cursor-not-allowed disabled:bg-[#8a7239]"
 						>
-							프로필 입력으로 이동
+							저택으로 들어가기
 						</button>
 					</div>
 				</div>
