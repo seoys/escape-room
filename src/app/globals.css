@@ -1,124 +1,334 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* ============================================================
+   CSS Custom Properties
+   ============================================================ */
+:root {
+  --color-bg: #0d0b12;
+  --color-brass: #c9a24b;
+  --color-brass-dim: rgba(201, 162, 75, 0.15);
+  --color-panel-bg: rgba(10, 8, 14, 0.85);
+  --color-candle-amber: #e8965a;
+  --color-candle-amber-dim: rgba(232, 150, 90, 0.15);
+  --color-wine-red: #7a1f2b;
+  --font-serif: 'Noto Serif KR', 'Playfair Display', serif;
+  --font-display: 'Playfair Display', 'Noto Serif KR', serif;
 }
 
-/* Custom Animations */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-.animate-shake {
-  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-@keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
-}
-
-.animate-glitch {
-  animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-}
-
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.animate-fade-in-scale {
-  animation: fadeInScale 0.5s ease-out forwards;
-}
-
-@keyframes screen-tear {
-  0% { transform: translate(0) skew(0) scale(1); filter: none; clip-path: none; }
-  10% { transform: translate(-10px, 5px) skew(-10deg) scale(1.02); filter: contrast(200%) hue-rotate(90deg); clip-path: inset(10% 0 80% 0); }
-  20% { transform: translate(10px, -5px) skew(10deg) scale(0.98); filter: contrast(100%) hue-rotate(-90deg); clip-path: inset(80% 0 10% 0); }
-  30% { transform: translate(-5px, 5px) skew(-5deg) scale(1.01); filter: contrast(200%); clip-path: inset(40% 0 40% 0); }
-  40% { transform: translate(5px, -5px) skew(5deg) scale(0.99); filter: none; clip-path: inset(0% 0 0% 0); }
-  50% { transform: translate(0) skew(0) scale(1); filter: none; clip-path: none; }
-  60% { transform: translate(-2px, 2px); }
-  70% { transform: translate(2px, -2px); }
-  100% { transform: translate(0) skew(0) scale(1); filter: none; clip-path: none; }
-}
-
-.animate-screen-tear {
-  animation: screen-tear 0.5s ease-in-out both;
-}
-
-.glass-panel {
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(0, 0, 0, 0.6) 100%);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
-
-.main-background {
-  background-image: url("/images/escape_room_main.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-}
-
+/* ============================================================
+   Base Reset
+   ============================================================ */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
-  overflow: hidden;
+  font-family: var(--font-serif);
+  background-color: var(--color-bg);
+  color: #c7bfae;
+  overflow-x: hidden;
 }
-.start-button {
+
+/* Custom selection */
+::selection {
+  background: var(--color-brass-dim);
+  color: var(--color-brass);
+}
+
+/* ============================================================
+   Home page key-drag background (kept from legacy, restyled)
+   ============================================================ */
+.main-background {
+  background-image: url('/images/escape_room_main.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100vw;
+  min-height: 100vh;
+  position: relative;
+}
+.main-background::after {
+  content: '';
   position: absolute;
-  cursor: pointer;
-  width: 300px;
-  height: 100px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background: transparent;
-  border: none;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(13, 11, 18, 0.35) 0%, rgba(13, 11, 18, 0.85) 100%);
+  pointer-events: none;
 }
-.continue-button {
+
+/* ============================================================
+   Static vignette (replaces mouse-tracking flashlight)
+   ============================================================ */
+.vignette-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle 700px at 50% 45%,
+    rgba(201, 162, 75, 0.04) 0%,
+    rgba(13, 11, 18, 0.96) 75%,
+    #060509 100%
+  );
+}
+
+/* Faint candle-like brightness pulse, for isolated accents only */
+@keyframes candle-flicker {
+  0%, 100% { opacity: 0.85; }
+  45% { opacity: 1; }
+  55% { opacity: 0.92; }
+}
+.candle-flicker {
+  animation: candle-flicker 3.2s ease-in-out infinite;
+}
+
+/* ============================================================
+   Antique panels
+   ============================================================ */
+.antique-panel {
+  background: var(--color-panel-bg);
+  border: 1px solid rgba(201, 162, 75, 0.25);
+  box-shadow:
+    0 0 24px rgba(201, 162, 75, 0.05),
+    inset 0 0 14px rgba(201, 162, 75, 0.04);
+  position: relative;
+}
+
+.antique-panel-warn {
+  background: rgba(20, 10, 10, 0.9);
+  border: 1px solid rgba(122, 31, 43, 0.4);
+  box-shadow:
+    0 0 20px rgba(122, 31, 43, 0.08),
+    inset 0 0 12px rgba(122, 31, 43, 0.06);
+}
+
+/* Corner bracket decorations */
+.corner-decor::before, .corner-decor::after {
+  content: '';
   position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: var(--color-brass);
+  border-style: solid;
+  pointer-events: none;
+}
+.corner-decor::before {
+  top: -1px; left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.corner-decor::after {
+  bottom: -1px; right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+.corner-decor-warn::before, .corner-decor-warn::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: var(--color-wine-red);
+  border-style: solid;
+  pointer-events: none;
+}
+.corner-decor-warn::before {
+  top: -1px; left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.corner-decor-warn::after {
+  bottom: -1px; right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* ============================================================
+   Forms & Inputs
+   ============================================================ */
+.antique-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(201, 162, 75, 0.25);
+  border-radius: 4px;
+  padding: 12px 16px;
+  color: var(--color-brass);
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.antique-input:focus {
+  border-color: var(--color-brass);
+  box-shadow:
+    0 0 10px rgba(201, 162, 75, 0.18),
+    inset 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.antique-input::placeholder {
+  color: rgba(201, 162, 75, 0.3);
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn-antique {
+  background: rgba(201, 162, 75, 0.06);
+  border: 1px solid rgba(201, 162, 75, 0.4);
+  color: var(--color-brass);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 10px 20px;
+  border-radius: 4px;
   cursor: pointer;
-  width: 300px;
-  height: 100px;
-  left: 50%;
-  top: 65%;
-  transform: translate(-50%, -50%);
-  background: transparent;
-  border: none;
+  transition: all 0.2s ease;
 }
 
-.perspective {
-  perspective: 1000px;
+.btn-antique:hover:not(:disabled) {
+  background: rgba(201, 162, 75, 0.16);
+  border-color: var(--color-brass);
+  box-shadow: 0 0 12px rgba(201, 162, 75, 0.22);
 }
 
-.preserve-3d {
-  transform-style: preserve-3d;
+.btn-antique-warn {
+  background: rgba(122, 31, 43, 0.08);
+  border: 1px solid rgba(122, 31, 43, 0.45);
+  color: #e6a3ab;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.backface-hidden {
-  backface-visibility: hidden;
+.btn-antique-warn:hover:not(:disabled) {
+  background: rgba(122, 31, 43, 0.18);
+  border-color: var(--color-wine-red);
+  box-shadow: 0 0 12px rgba(122, 31, 43, 0.28);
 }
 
-.rotate-y-180 {
-  transform: rotateY(180deg);
+/* ============================================================
+   Sealed document ( 봉인된 기록 ) 스타일
+   ============================================================ */
+.dossier-stamp {
+  border: 3px double var(--color-wine-red);
+  color: var(--color-wine-red);
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transform: rotate(-12deg);
+  opacity: 0.85;
+  box-shadow: 0 0 6px rgba(122, 31, 43, 0.25);
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in-scale {
+  animation: fadeInScale 0.5s ease-out forwards;
+}
+
+@keyframes badgePop {
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-badge-pop {
+  animation: badgePop 0.35s ease-out forwards;
+}
+
+@keyframes brass-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+.cursor-blink {
+  animation: brass-pulse 1s infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* HUD Progress */
+.hud-progress-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(201, 162, 75, 0.1);
+}
+.hud-progress-fill {
+  height: 100%;
+  background: var(--color-brass);
+  box-shadow: 0 0 8px var(--color-brass);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* HUD stat chip (room number / score / combo / hints) */
+.hud-stat {
+  border: 1px solid rgba(201, 162, 75, 0.3);
+  border-radius: 4px;
+  padding: 4px 10px;
+  min-width: 56px;
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 10px 16px;
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  animation: fadeInScale 0.25s ease-out forwards;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.toast-success {
+  background: rgba(201, 162, 75, 0.14);
+  border: 1px solid rgba(201, 162, 75, 0.4);
+  color: var(--color-brass);
+}
+.toast-error {
+  background: rgba(122, 31, 43, 0.18);
+  border: 1px solid rgba(122, 31, 43, 0.5);
+  color: #e6a3ab;
+}
+
+/* Custom scrollbar for antique panels */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 75, 0.25);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 162, 75, 0.45);
 }
