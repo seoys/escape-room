@@ -86,63 +86,64 @@ export default function FinishPage() {
 	}, [endTime, startTime, hintsUsed]);
 
 	return (
-		<main className="min-h-screen flex items-center justify-center relative overflow-hidden">
+		<main className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: 'var(--color-bg)' }}>
 			<Image
 				src="/images/finish_background.png"
 				alt="배경 이미지"
 				fill
-				className="object-cover"
+				className="object-cover opacity-40"
 				priority
 			/>
+			<div className="vignette-bg" />
 			<div className="relative z-10 max-w-2xl w-full mx-4">
-				<div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center">
-					<h1 className="text-4xl font-bold mb-6 text-orange-800">
-						🎉 축하합니다!
+				<div className="antique-panel rounded-2xl shadow-2xl p-8 text-center">
+					<h1 className="text-4xl font-bold mb-6 text-[#c9a24b]" style={{ fontFamily: 'var(--font-display)' }}>
+						🕯 탈출을 축하합니다
 					</h1>
-					<p className="text-xl text-gray-700 mb-8">
-						모든 방을 성공적으로 탈출했습니다!
+					<p className="text-xl text-slate-300 mb-8">
+						저택의 모든 방에서 무사히 빠져나오셨습니다.
 					</p>
-					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner">
-						<p className="text-lg font-medium text-orange-900">
+					<div className="bg-[rgba(201,162,75,0.06)] border border-[rgba(201,162,75,0.2)] p-6 rounded-xl mb-8 shadow-inner">
+						<p className="text-lg font-medium text-[#e8d9b0]">
 							이름: {playerName}
 						</p>
-						<p className="text-lg font-medium text-orange-900 mt-2 flex flex-col items-center">
+						<p className="text-lg font-medium text-[#e8d9b0] mt-2 flex flex-col items-center">
 							<span>최종 소요 시간: {timeLabel}</span>
 							{penaltyLabel && (
-								<span className="text-sm text-red-600 font-bold mt-1">
+								<span className="text-sm text-[#e6a3ab] font-bold mt-1">
 									{penaltyLabel}
 								</span>
 							)}
 						</p>
-						<p className="text-lg font-medium text-orange-900 mt-2">
+						<p className="text-lg font-medium text-[#e8d9b0] mt-2">
 							최종 점수: {scoreLabel}
 						</p>
-						<p className="text-lg font-medium text-orange-900 mt-1">
-							최고 콤보: x{comboLabel}
+						<p className="text-lg font-medium text-[#e8d9b0] mt-1">
+							최고 연속: x{comboLabel}
 						</p>
 					</div>
 
-					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner text-left">
-						<h2 className="text-2xl font-bold text-orange-800 mb-3 text-center">
-							🎖️ 업적
+					<div className="bg-[rgba(201,162,75,0.06)] border border-[rgba(201,162,75,0.2)] p-6 rounded-xl mb-8 shadow-inner text-left">
+						<h2 className="text-2xl font-bold text-[#c9a24b] mb-3 text-center" style={{ fontFamily: 'var(--font-display)' }}>
+							남겨진 기록
 						</h2>
 						<ul className="space-y-2">
 							{achievements.map(item => (
 								<li
 									key={item}
-									className="bg-white/80 rounded-lg px-3 py-2 text-orange-900 text-sm"
+									className="bg-black/40 border border-[rgba(201,162,75,0.15)] rounded-lg px-3 py-2 text-[#e8d9b0] text-sm"
 								>
 									{item}
 								</li>
 							))}
 						</ul>
 					</div>
-					<div className="bg-orange-50 p-6 rounded-xl mb-8 shadow-inner">
-						<h2 className="text-2xl font-bold text-orange-800 mb-4">
-							🏆 TOP 5
+					<div className="bg-[rgba(201,162,75,0.06)] border border-[rgba(201,162,75,0.2)] p-6 rounded-xl mb-8 shadow-inner">
+						<h2 className="text-2xl font-bold text-[#c9a24b] mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+							방명록 TOP 5
 						</h2>
 						{leaderboardError ? (
-							<p className="text-sm text-orange-900">
+							<p className="text-sm text-[#e8d9b0]">
 								{leaderboardError}
 							</p>
 						) : (
@@ -150,33 +151,33 @@ export default function FinishPage() {
 								{topUsers.map((user, index) => (
 									<div
 										key={user.name}
-										className="flex items-center justify-between bg-white/80 p-3 rounded-lg"
+										className="flex items-center justify-between bg-black/40 border border-[rgba(201,162,75,0.15)] p-3 rounded-lg"
 									>
 										<div className="flex items-center gap-2">
-											<span className="font-bold text-orange-600 w-8">
+											<span className="font-bold text-[#c9a24b] w-8">
 												{index === 0 && '🥇'}
 												{index === 1 && '🥈'}
 												{index === 2 && '🥉'}
-												{index > 2 && '🎖️'}
+												{index > 2 && '🕯'}
 											</span>
-											<span className="font-medium">
+											<span className="font-medium text-[#e8d9b0]">
 												{user.name}
 											</span>
 											{user.ageGroup && (
-												<span className="text-xs text-orange-500">
+												<span className="text-xs text-[#a38a4a]">
 													({user.ageGroup})
 												</span>
 											)}
 										</div>
-										<span className="text-gray-600">
+										<span className="text-slate-400">
 											{Math.floor(user.seconds / 60)}분{' '}
 											{user.seconds % 60}초
 										</span>
 									</div>
 								))}
 								{topUsers.length === 0 ? (
-									<p className="text-sm text-orange-900">
-										아직 랭킹 정보가 없습니다.
+									<p className="text-sm text-[#e8d9b0]">
+										아직 방명록이 비어 있습니다.
 									</p>
 								) : null}
 							</div>
@@ -185,7 +186,7 @@ export default function FinishPage() {
 
 					<Link
 						href="/"
-						className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+						className="inline-block bg-[#c9a24b] hover:bg-[#dcb768] text-[#0d0b12] font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
 					>
 						처음으로 돌아가기
 					</Link>
