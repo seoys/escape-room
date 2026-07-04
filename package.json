@@ -21,6 +21,7 @@
     "pm2:monit": "pm2 monit"
   },
   "dependencies": {
+    "@chenglou/pretext": "^0.0.8",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-toast": "^1.2.6",

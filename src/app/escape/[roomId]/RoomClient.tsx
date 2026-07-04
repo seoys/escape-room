@@ -6,16 +6,17 @@ import { useGameStore } from '@/store/gameStore';
 import Image from 'next/image';
 import { writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
-import { Level, Room } from '@/types/room';
+import { ClientRoom, Level } from '@/types/room';
 import { verifyAnswer } from '@/app/actions/game';
 import ComboLockInput from '@/components/ComboLockInput';
 import TileOrderInput from '@/components/TileOrderInput';
 import SpeedrunTimer from '@/components/SpeedrunTimer';
 import ParticleBackground from '@/components/ParticleBackground';
+import PretextQuestionText from '@/components/PretextQuestionText';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
 interface RoomClientProps {
-	room: Omit<Room, 'answer'>;
+	room: ClientRoom;
 	roomId: number;
 	level: Level;
 	isLastRoom: boolean;
@@ -187,7 +188,7 @@ export default function RoomClient({
 		setIsSubmitting(true);
 
 		try {
-			const isValid = await verifyAnswer(roomId, answer, level);
+			const isValid = await verifyAnswer(roomId, answer, level, room.variantId);
 
 			if (isValid) {
 				const baseScore = 100 + room.difficulty * 25;
@@ -490,12 +491,10 @@ export default function RoomClient({
 							<div className="text-[10px] text-[#a38a4a] tracking-wider mb-3 border-b border-[rgba(201,162,75,0.15)] pb-1">
 								이 방에 남겨진 수수께끼
 							</div>
-							<pre
-								className="whitespace-pre-wrap leading-relaxed text-sm md:text-base text-slate-300"
-								style={{ fontWeight: 400, fontFamily: 'var(--font-serif)' }}
-							>
-								{room.question}
-							</pre>
+							<PretextQuestionText
+								text={room.question}
+								className="text-sm md:text-base text-slate-300"
+							/>
 						</div>
 
 						{/* Target image (Stage 10 spec) */}

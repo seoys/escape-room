@@ -43,17 +43,23 @@ export default async function RoomPage({ params }: PageProps) {
     return arr;
   };
 
+  const selectedVariant = room.variants?.length
+    ? room.variants[Math.floor(Math.random() * room.variants.length)]
+    : undefined;
+  const playableRoom = selectedVariant ?? room;
+
   // Sanitize: Security measure to remove answer from client payload
   const sanitizedRoom = {
     id: room.id,
-    title: room.title,
-    question: room.question,
-    hint: room.hint,
-    type: room.type,
-    difficulty: room.difficulty,
-    inputType: room.inputType,
-    comboLength: room.comboLength,
-    tiles: room.tiles ? shuffleTiles(room.tiles) : undefined,
+    variantId: selectedVariant?.variantId,
+    title: playableRoom.title,
+    question: playableRoom.question,
+    hint: playableRoom.hint,
+    type: playableRoom.type,
+    difficulty: playableRoom.difficulty,
+    inputType: playableRoom.inputType,
+    comboLength: playableRoom.comboLength,
+    tiles: playableRoom.tiles ? shuffleTiles(playableRoom.tiles) : undefined,
   };
   const isLastRoom = parsedRoomId === TOTAL_ROOMS;
 
