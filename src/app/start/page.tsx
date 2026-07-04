@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/store/gameStore';
 import { readSession, writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
-import { getAgeGroupFromAge } from '@/lib/age-group';
+import { getLevelFromAge } from '@/lib/age-group';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
-const AGE_GROUP_LABELS: Record<string, { label: string; desc: string; detail: string }> = {
-	teen: { label: '제1관 [청소년]', desc: '난이도 01 ~ 30', detail: '저택 초입, 가벼운 수수께끼가 기다리고 있습니다.' },
-	adult: { label: '제2관 [성인]', desc: '난이도 31 ~ 60', detail: '깊은 서재, 얽히고설킨 단서들을 풀어야 합니다.' },
-	senior: { label: '제3관 [시니어]', desc: '난이도 61 ~ 90', detail: '오래된 지하실, 연륜과 통찰이 필요한 방입니다.' },
+const LEVEL_LABELS: Record<number, { label: string; desc: string; detail: string }> = {
+	1: { label: '제1관 [입문]', desc: '방 01 ~ 30', detail: '저택 초입의 가벼운 수수께끼들이 기다리고 있습니다.' },
+	2: { label: '제2관 [심화]', desc: '방 31 ~ 60', detail: '서재 깊은 곳, 조금 더 얽힌 단서들을 풀어야 합니다.' },
+	3: { label: '제3관 [고급]', desc: '방 61 ~ 90', detail: '지하실의 낡은 장치들이 정교한 추리를 요구합니다.' },
+	4: { label: '제4관 [최상급]', desc: '방 91 ~ 120', detail: '가장 깊은 곳, 저택 최후의 진실이 기다립니다.' },
 };
 
 const GENDER_OPTIONS = [
@@ -36,9 +37,9 @@ export default function StartPage() {
 	const { setCurrentRoom, setHintsRemaining } = useGameStore();
 
 	const parsedAge = parseInt(age, 10);
-	const ageGroup =
+	const level =
 		Number.isFinite(parsedAge) && parsedAge >= 8 && parsedAge <= 100
-			? getAgeGroupFromAge(parsedAge)
+			? getLevelFromAge(parsedAge)
 			: null;
 
 	// Terminal typing simulation logs
@@ -115,7 +116,7 @@ export default function StartPage() {
 		setIsSubmitting(true);
 
 		const trimmedName = name.trim();
-		const currentAgeGroup = getAgeGroupFromAge(parsedAge);
+		const currentLevel = getLevelFromAge(parsedAge);
 		const playerKey = `escape_${trimmedName}_${gender}_${parsedAge}`;
 
 		try {
@@ -123,9 +124,9 @@ export default function StartPage() {
 			localStorage.setItem('playerName', trimmedName);
 			localStorage.setItem('playerGender', gender);
 			localStorage.setItem('playerAge', parsedAge.toString());
-			localStorage.setItem('playerAgeGroup', currentAgeGroup);
+			localStorage.setItem('playerLevel', currentLevel.toString());
 			localStorage.setItem('playerKey', playerKey);
-			document.cookie = `player_age_group=${currentAgeGroup}; path=/; max-age=2592000`;
+			document.cookie = `player_level=${currentLevel}; path=/; max-age=2592000`;
 
 			const existingSession = await readSession(playerKey);
 
@@ -163,7 +164,7 @@ export default function StartPage() {
 				displayName: trimmedName,
 				gender,
 				age: parsedAge,
-				ageGroup: currentAgeGroup,
+				level: currentLevel,
 				host: localStorage.getItem('userHost'),
 				userAgent: localStorage.getItem('userAgent'),
 				platform: localStorage.getItem('userPlatform'),
@@ -188,7 +189,7 @@ export default function StartPage() {
 		}
 	};
 
-	const ageGroupInfo = ageGroup ? AGE_GROUP_LABELS[ageGroup] : null;
+	const levelInfo = level ? LEVEL_LABELS[level] : null;
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden select-none" style={{ background: 'var(--color-bg)' }}>
@@ -319,9 +320,9 @@ export default function StartPage() {
 						<div className="flex flex-col gap-2">
 							<div className="flex justify-between text-xs tracking-widest text-[#a38a4a]">
 								나이
-								{ageGroupInfo && (
+								{levelInfo && (
 									<span className="text-[#c9a24b] font-bold animate-badge-pop">
-										{ageGroupInfo.label}
+										{levelInfo.label}
 									</span>
 								)}
 							</div>
@@ -337,10 +338,10 @@ export default function StartPage() {
 									className="antique-input"
 								/>
 							</div>
-							{ageGroupInfo && (
+							{levelInfo && (
 								<div className="p-3 bg-[rgba(201,162,75,0.08)] border border-[rgba(201,162,75,0.2)] text-[11px] text-[#c9a24b]/80 leading-normal flex flex-col gap-1">
-									<div><strong>[안내될 방]:</strong> {ageGroupInfo.desc}</div>
-									<div className="text-[#a38a4a]">{ageGroupInfo.detail}</div>
+									<div><strong>[안내될 방]:</strong> {levelInfo.desc}</div>
+									<div className="text-[#a38a4a]">{levelInfo.detail}</div>
 								</div>
 							)}
 						</div>
