@@ -585,9 +585,9 @@ export const rooms: Room[] = [
 	{
 		id: 59,
 		title: '거꾸로 된 단어',
-		question: '[서재의 기록]\n"TEACLE"의 마지막 3글자를 순서대로 입력하시오. (대문자 3글자)',
-		answer: 'CLE',
-		hint: '뒤에서 3글자를 세어보세요: T-E-A-C-L-E',
+		question: '[서재의 기록]\n벽난로 위에 "MANTLE"이라 적힌 팻말이 있다.\n이 단어의 마지막 3글자를 순서대로 입력하시오. (대문자 3글자)',
+		answer: 'TLE',
+		hint: '뒤에서 3글자를 세어보세요: M-A-N-T-L-E',
 		type: '암호',
 		difficulty: 2,
 	},
