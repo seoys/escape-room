@@ -2,10 +2,10 @@ import { notFound, redirect } from 'next/navigation';
 import RoomClient from './RoomClient';
 import { cookies } from 'next/headers';
 import {
-  AGE_GROUP_COOKIE_KEY,
-  getRoomsForAgeGroup,
+  LEVEL_COOKIE_KEY,
+  getRoomsForLevel,
 } from '@/lib/room-selector';
-import { normalizeAgeGroup } from '@/lib/age-group';
+import { normalizeLevel } from '@/lib/age-group';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
 
@@ -17,9 +17,9 @@ export default async function RoomPage({ params }: PageProps) {
   const resolvedParams = await params;
   const parsedRoomId = parseInt(resolvedParams.roomId, 10);
   const cookieStore = await cookies();
-  const ageGroup = normalizeAgeGroup(cookieStore.get(AGE_GROUP_COOKIE_KEY)?.value);
-  const selectedRooms = getRoomsForAgeGroup(ageGroup);
-  
+  const level = normalizeLevel(cookieStore.get(LEVEL_COOKIE_KEY)?.value);
+  const selectedRooms = getRoomsForLevel(level);
+
   if (!Number.isFinite(parsedRoomId) || parsedRoomId < 1) {
     redirect('/escape/1');
   }
@@ -31,8 +31,17 @@ export default async function RoomPage({ params }: PageProps) {
   const room = selectedRooms[parsedRoomId - 1];
 
   if (!room) {
-    notFound(); 
+    notFound();
   }
+
+  const shuffleTiles = (tiles: string[]): string[] => {
+    const arr = [...tiles];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
 
   // Sanitize: Security measure to remove answer from client payload
   const sanitizedRoom = {
@@ -43,15 +52,16 @@ export default async function RoomPage({ params }: PageProps) {
     type: room.type,
     difficulty: room.difficulty,
     inputType: room.inputType,
-    comboLength: room.comboLength
+    comboLength: room.comboLength,
+    tiles: room.tiles ? shuffleTiles(room.tiles) : undefined,
   };
   const isLastRoom = parsedRoomId === TOTAL_ROOMS;
 
   return (
-    <RoomClient 
-      room={sanitizedRoom} 
+    <RoomClient
+      room={sanitizedRoom}
       roomId={parsedRoomId}
-      ageGroup={ageGroup}
+      level={level}
       isLastRoom={isLastRoom}
     />
   );

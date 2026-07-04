@@ -1,17 +1,20 @@
 import { rooms } from '@/lib/rooms-data';
-import { AgeGroup, Room } from '@/types/room';
-import { getAgeGroupFromAge, normalizeAgeGroup } from '@/lib/age-group';
+import { Level, Room } from '@/types/room';
+import { getLevelFromAge, normalizeLevel } from '@/lib/age-group';
 
-export const AGE_GROUP_COOKIE_KEY = 'player_age_group';
+export const LEVEL_COOKIE_KEY = 'player_level';
 
-export const getRoomsForAgeGroup = (ageGroup: AgeGroup): Room[] => {
-	if (ageGroup === 'teen') {
+export const getRoomsForLevel = (level: Level): Room[] => {
+	if (level === 1) {
 		return rooms.filter(room => room.id >= 1 && room.id <= 30);
 	}
-	if (ageGroup === 'adult') {
+	if (level === 2) {
 		return rooms.filter(room => room.id >= 31 && room.id <= 60);
 	}
-	return rooms.filter(room => room.id >= 61 && room.id <= 90);
+	if (level === 3) {
+		return rooms.filter(room => room.id >= 61 && room.id <= 90);
+	}
+	return rooms.filter(room => room.id >= 91 && room.id <= 120);
 };
 
-export { getAgeGroupFromAge, normalizeAgeGroup };
+export { getLevelFromAge, normalizeLevel };
