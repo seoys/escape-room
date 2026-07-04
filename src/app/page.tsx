@@ -1,215 +1,201 @@
 'use client';
+
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-const KEYHOLE_POSITION = { x: 50, y: 40 };
-const KEYHOLE_RADIUS = 4;
-const KEY_RANGE = {
-	x: { min: 10, max: 90 },
-	y: { min: 10, max: 90 },
-};
-const INITIAL_KEY_POSITION = {
-	x: (KEY_RANGE.x.min + KEY_RANGE.x.max) / 2,
-	y: KEY_RANGE.y.max - 5,
-};
+const SEAL_RINGS = [
+	{
+		id: 'outer',
+		label: '바깥 봉인',
+		size: 'min(78vw, 420px)',
+		symbols: ['◆', '✦', '▲', '●', '✧', '■'],
+		targetIndex: 1,
+		stepClass: 'home-seal-step-outer',
+	},
+	{
+		id: 'middle',
+		label: '중앙 봉인',
+		size: 'min(58vw, 310px)',
+		symbols: ['☾', '◇', '✶', '⬟', '○'],
+		targetIndex: 2,
+		stepClass: 'home-seal-step-middle',
+	},
+	{
+		id: 'inner',
+		label: '안쪽 봉인',
+		size: 'min(38vw, 205px)',
+		symbols: ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ'],
+		targetIndex: 3,
+		stepClass: 'home-seal-step-inner',
+	},
+] as const;
 
-const getRandomKeyPosition = () => ({
-	x: KEY_RANGE.x.min + Math.random() * (KEY_RANGE.x.max - KEY_RANGE.x.min),
-	y: KEY_RANGE.y.min + Math.random() * (KEY_RANGE.y.max - KEY_RANGE.y.min),
-});
+const getRandomRotations = () =>
+	SEAL_RINGS.map(ring => {
+		const next = Math.floor(Math.random() * ring.symbols.length);
+		return next === ring.targetIndex
+			? (next + 1) % ring.symbols.length
+			: next;
+	});
 
-const clamp = (value: number, min: number, max: number) =>
-	Math.min(Math.max(value, min), max);
-
-const isWithinKeyhole = (x: number, y: number) => {
-	const dx = x - KEYHOLE_POSITION.x;
-	const dy = y - KEYHOLE_POSITION.y;
-	return Math.sqrt(dx * dx + dy * dy) <= KEYHOLE_RADIUS;
-};
+const normalizeRotation = (rotation: number, length: number) =>
+	((rotation % length) + length) % length;
 
 export default function Home() {
 	const router = useRouter();
-
-	const [keyPosition, setKeyPosition] = useState(INITIAL_KEY_POSITION);
-	const [isDragging, setIsDragging] = useState(false);
+	const [rotations, setRotations] = useState(() =>
+		SEAL_RINGS.map(() => 0),
+	);
+	const [isHydrated, setIsHydrated] = useState(false);
 	const [hasUnlocked, setHasUnlocked] = useState(false);
-	const [dragPointerId, setDragPointerId] = useState<number | null>(null);
-	const pointerOffsetRef = useRef({ x: 0, y: 0 });
-	const hasUnlockedRef = useRef(false);
-
-	const playgroundRef = useRef<HTMLDivElement>(null);
-
-	const getPointerPercentage = useCallback(
-		(clientX: number, clientY: number) => {
-			if (!playgroundRef.current) return;
-			const rect = playgroundRef.current.getBoundingClientRect();
-			const left = ((clientX - rect.left) / rect.width) * 100;
-			const top = ((clientY - rect.top) / rect.height) * 100;
-			return { x: left, y: top };
-		},
-		[],
-	);
-
-	const updateKeyDirectly = useCallback(
-		(clientX: number, clientY: number) => {
-			const pointerPercent = getPointerPercentage(clientX, clientY);
-			if (!pointerPercent) return;
-			const targetPosition = {
-				x: clamp(
-					pointerPercent.x + pointerOffsetRef.current.x,
-					KEY_RANGE.x.min,
-					KEY_RANGE.x.max,
-				),
-				y: clamp(
-					pointerPercent.y + pointerOffsetRef.current.y,
-					KEY_RANGE.y.min,
-					KEY_RANGE.y.max,
-				),
-			};
-			setKeyPosition(targetPosition);
-
-			if (
-				!hasUnlockedRef.current &&
-				isWithinKeyhole(targetPosition.x, targetPosition.y)
-			) {
-				hasUnlockedRef.current = true;
-				setHasUnlocked(true);
-			}
-		},
-		[getPointerPercentage],
-	);
-
-	const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-		event.preventDefault();
-		const pointerPercent = getPointerPercentage(
-			event.clientX,
-			event.clientY,
-		);
-		if (!pointerPercent) return;
-
-		pointerOffsetRef.current = {
-			x: keyPosition.x - pointerPercent.x,
-			y: keyPosition.y - pointerPercent.y,
-		};
-
-		setIsDragging(true);
-		setDragPointerId(event.pointerId);
-		event.currentTarget.setPointerCapture(event.pointerId);
-	};
-
-	const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-		event.preventDefault();
-		if (!isDragging || event.pointerId !== dragPointerId) return;
-		updateKeyDirectly(event.clientX, event.clientY);
-	};
-
-	const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-		if (event.pointerId !== dragPointerId) return;
-		setIsDragging(false);
-		setDragPointerId(null);
-		event.currentTarget.releasePointerCapture(event.pointerId);
-	};
 
 	useEffect(() => {
-		if (!isDragging) return;
-
-		const handleWindowPointerMove = (event: PointerEvent) => {
-			if (event.pointerId !== dragPointerId) return;
-			event.preventDefault();
-			updateKeyDirectly(event.clientX, event.clientY);
-		};
-
-		const handleWindowPointerUp = (event: PointerEvent) => {
-			if (event.pointerId !== dragPointerId) return;
-			setIsDragging(false);
-			setDragPointerId(null);
-		};
-
-		window.addEventListener('pointermove', handleWindowPointerMove);
-		window.addEventListener('pointerup', handleWindowPointerUp);
-
-		return () => {
-			window.removeEventListener('pointermove', handleWindowPointerMove);
-			window.removeEventListener('pointerup', handleWindowPointerUp);
-		};
-	}, [dragPointerId, isDragging, updateKeyDirectly]);
-
-	useEffect(() => {
-		hasUnlockedRef.current = hasUnlocked;
-	}, [hasUnlocked]);
-
-	useEffect(() => {
-		// avoid hydration mismatches by randomizing only on the client
-		setKeyPosition(getRandomKeyPosition());
+		setRotations(getRandomRotations());
+		setIsHydrated(true);
 	}, []);
+
+	const alignedCount = useMemo(
+		() =>
+			SEAL_RINGS.filter(
+				(ring, index) =>
+					normalizeRotation(rotations[index], ring.symbols.length) ===
+					ring.targetIndex,
+			).length,
+		[rotations],
+	);
+
+	useEffect(() => {
+		if (isHydrated && alignedCount === SEAL_RINGS.length) {
+			const timer = window.setTimeout(() => setHasUnlocked(true), 420);
+			return () => window.clearTimeout(timer);
+		}
+		setHasUnlocked(false);
+	}, [alignedCount, isHydrated]);
+
+	const rotateRing = (ringIndex: number) => {
+		if (hasUnlocked) return;
+		setRotations(prev =>
+			prev.map((rotation, index) =>
+				index === ringIndex ? rotation + 1 : rotation,
+			),
+		);
+	};
 
 	return (
 		<main className="main-background">
-			<div
-				ref={playgroundRef}
-				className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 text-center text-white"
-				style={{ touchAction: 'none' }}
-			>
-				<div className="mb-8 max-w-md rounded-full bg-black/60 border border-[rgba(201,162,75,0.3)] px-6 py-3 text-sm font-medium tracking-wide text-[#e8d9b0] backdrop-blur">
-					낡은 열쇠🔑를 쥐고 자물쇠 구멍에 꽂아보세요.
-				</div>
-
-				<div
-					className={`absolute h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#c9a24b] transition-opacity duration-300 ${
-						hasUnlocked ? 'opacity-0' : 'opacity-80'
-					}`}
-					style={{
-						left: `${KEYHOLE_POSITION.x}%`,
-						top: `${KEYHOLE_POSITION.y}%`,
-					}}
-					aria-hidden
-				/>
-
-				<div
-					role="button"
-					tabIndex={0}
-					aria-label="열쇠를 드래그 해서 문을 열기"
-					className="absolute z-10 cursor-grab select-none active:cursor-grabbing touch-none"
-					style={{
-						left: `${keyPosition.x}%`,
-						top: `${keyPosition.y}%`,
-						transform: 'translate(-50%, -50%)',
-					}}
-					onPointerDown={handlePointerDown}
-					onPointerMove={handlePointerMove}
-					onPointerUp={handlePointerUp}
-					onBlur={() => setIsDragging(false)}
-					onKeyDown={event => {
-						if (event.key === 'Enter' || event.key === ' ') {
-							setHasUnlocked(true);
-						}
-					}}
-				>
-					<span className="text-4xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-						🔑
-					</span>
-				</div>
-			</div>
-
-			{hasUnlocked && (
-				<div className="fixed inset-0 z-20 flex items-center justify-center bg-black/70 px-4">
-					<div className="w-full max-w-sm rounded-2xl bg-white/90 p-6 text-left text-gray-900 shadow-2xl backdrop-blur">
-						<h2 className="mb-3 text-lg font-semibold" style={{ fontFamily: 'var(--font-display)' }}>
-							방문객 기록을 남겨주세요
-						</h2>
-						<p className="mb-4 text-sm text-gray-600">
-							자물쇠가 열렸습니다. 다음 화면에서 이름, 성별, 나이를 남기면 나이대에 맞는 저택의 방들이 준비됩니다.
-						</p>
-						<button
-							type="button"
-							onClick={() => router.push('/start')}
-							className="mt-2 w-full rounded-lg bg-[#c9a24b] py-2 text-center text-base font-semibold text-[#0d0b12] transition hover:bg-[#dcb768] disabled:cursor-not-allowed disabled:bg-[#8a7239]"
-						>
-							저택으로 들어가기
-						</button>
+			<div className="home-start-stage relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 text-center text-white">
+				<div className="home-start-copy">
+					<div className="text-[10px] tracking-[0.45em] text-[#c9a24b]/70">
+						SOSO HAPPY ESCAPE ARCHIVE
+					</div>
+					<h1
+						className="mt-3 text-4xl font-bold tracking-wide text-slate-100 md:text-6xl"
+						style={{ fontFamily: 'var(--font-display)' }}
+					>
+						저택의 봉인
+					</h1>
+					<div className="mt-4 text-xs tracking-[0.35em] text-[#e8d9b0]/75">
+						{`SEAL ${alignedCount} / ${SEAL_RINGS.length}`}
 					</div>
 				</div>
-			)}
+
+				<div
+					className={`home-seal-board ${hasUnlocked ? 'home-seal-board-open' : ''}`}
+					aria-label="저택의 봉인 장치"
+				>
+					<div className="home-seal-target" aria-hidden="true">
+						✦
+					</div>
+					<div className="home-seal-core" aria-hidden="true">
+						<div className="home-seal-core-light" />
+					</div>
+
+					{SEAL_RINGS.map((ring, ringIndex) => {
+						const rotation = normalizeRotation(
+							rotations[ringIndex],
+							ring.symbols.length,
+						);
+						const isAligned = rotation === ring.targetIndex;
+
+						return (
+							<button
+								key={ring.id}
+								type="button"
+								aria-label={`${ring.label} 회전`}
+								aria-pressed={isAligned}
+								className={`home-seal-ring ${ring.stepClass} ${
+									isAligned ? 'home-seal-ring-aligned' : ''
+								}`}
+								style={
+									{
+										'--seal-size': ring.size,
+										'--seal-rotation': `${-rotation * (360 / ring.symbols.length)}deg`,
+									} as CSSProperties
+								}
+								onClick={() => rotateRing(ringIndex)}
+							>
+								<span className="home-seal-ring-track" aria-hidden="true">
+									{ring.symbols.map((symbol, symbolIndex) => (
+										<span
+											key={`${ring.id}-${symbol}`}
+											className="home-seal-symbol"
+											style={
+												{
+													'--symbol-angle': `${
+														symbolIndex * (360 / ring.symbols.length)
+													}deg`,
+												} as CSSProperties
+											}
+										>
+											{symbol}
+										</span>
+									))}
+								</span>
+							</button>
+						);
+					})}
+
+					<div className="home-seal-status" aria-hidden="true">
+						{SEAL_RINGS.map((ring, index) => (
+							<span
+								key={ring.id}
+								className={
+									normalizeRotation(rotations[index], ring.symbols.length) ===
+									ring.targetIndex
+										? 'bg-[#c9a24b]'
+										: 'bg-[#c9a24b]/20'
+								}
+							/>
+						))}
+					</div>
+				</div>
+
+				{hasUnlocked && (
+					<div className="fixed inset-0 z-20 flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
+						<div className="antique-panel relative w-full max-w-sm rounded p-6 text-left shadow-2xl">
+							<div className="corner-decor" />
+							<h2
+								className="mb-3 text-xl font-semibold text-slate-100"
+								style={{ fontFamily: 'var(--font-display)' }}
+							>
+								봉인이 풀렸습니다
+							</h2>
+							<p className="mb-5 text-sm leading-relaxed text-slate-300">
+								저택이 방문객의 기록을 요구합니다. 다음 문서에 이름,
+								성별, 나이를 남기면 방들이 열립니다.
+							</p>
+							<button
+								type="button"
+								onClick={() => router.push('/start')}
+								className="btn-antique w-full py-3 text-sm font-bold tracking-widest"
+							>
+								저택으로 들어가기
+							</button>
+						</div>
+					</div>
+				)}
+			</div>
 		</main>
 	);
 }
