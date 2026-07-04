@@ -24,6 +24,7 @@ export default function PretextQuestionText({
 	const lastFrameRef = useRef(0);
 	const [width, setWidth] = useState(FALLBACK_WIDTH);
 	const [shadowProgress, setShadowProgress] = useState(0);
+	const [hasSettled, setHasSettled] = useState(false);
 	const [reducedMotion, setReducedMotion] = useState(false);
 
 	useEffect(() => {
@@ -51,7 +52,8 @@ export default function PretextQuestionText({
 
 	useEffect(() => {
 		if (reducedMotion) {
-			setShadowProgress(0.18);
+			setHasSettled(true);
+			setShadowProgress(1);
 			return;
 		}
 
@@ -61,24 +63,31 @@ export default function PretextQuestionText({
 		const tick = (now: number) => {
 			if (now - lastFrameRef.current > 90) {
 				lastFrameRef.current = now;
-				const elapsed = (now - startedAt) / 5200;
-				setShadowProgress(elapsed % 1);
+				const progress = Math.min(1, (now - startedAt) / 2600);
+				setShadowProgress(progress);
+
+				if (progress >= 1) {
+					setHasSettled(true);
+					return;
+				}
 			}
 			animationFrame = requestAnimationFrame(tick);
 		};
 
+		setHasSettled(false);
+		setShadowProgress(0);
 		animationFrame = requestAnimationFrame(tick);
 		return () => cancelAnimationFrame(animationFrame);
 	}, [reducedMotion]);
 
 	const getShadowOffset = useCallback((lineIndex: number) => {
-		if (reducedMotion) return 0;
+		if (reducedMotion || hasSettled) return 0;
 
 		const shadowCenter = shadowProgress * 12 - 2;
 		const distance = Math.abs(lineIndex - shadowCenter);
 		const overlap = Math.max(0, 1 - distance / 2.2);
 		return Math.round(overlap * Math.min(width * 0.28, 150));
-	}, [reducedMotion, shadowProgress, width]);
+	}, [hasSettled, reducedMotion, shadowProgress, width]);
 
 	const lines = useMemo(() => {
 		try {
@@ -118,7 +127,7 @@ export default function PretextQuestionText({
 			className={`pretext-question-text ${className}`}
 			aria-label={text}
 		>
-			{!reducedMotion && (
+			{!reducedMotion && !hasSettled && (
 				<span
 					className="pretext-shadow-sweep"
 					style={{ transform: `translateY(${shadowProgress * 128 - 18}px)` }}
