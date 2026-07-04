@@ -7,8 +7,9 @@ import { readSession, writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
 import { getLevelFromAge } from '@/lib/age-group';
 import { TOTAL_ROOMS } from '@/lib/constants';
+import { Level } from '@/types/room';
 
-const LEVEL_LABELS: Record<number, { label: string; desc: string; detail: string }> = {
+const LEVEL_LABELS: Record<Level, { label: string; desc: string; detail: string }> = {
 	1: { label: '제1관 [입문]', desc: '방 01 ~ 30', detail: '저택 초입의 가벼운 수수께끼들이 기다리고 있습니다.' },
 	2: { label: '제2관 [심화]', desc: '방 31 ~ 60', detail: '서재 깊은 곳, 조금 더 얽힌 단서들을 풀어야 합니다.' },
 	3: { label: '제3관 [고급]', desc: '방 61 ~ 90', detail: '지하실의 낡은 장치들이 정교한 추리를 요구합니다.' },
