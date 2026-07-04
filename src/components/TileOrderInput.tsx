@@ -9,8 +9,8 @@ interface TileOrderInputProps {
   disabled?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function TileOrderInput({ tiles, value, onChange, disabled }: TileOrderInputProps) {
+// selectedIndices, not value, is the source of truth — value may be ambiguous with duplicate tiles
+export default function TileOrderInput({ tiles, onChange, disabled }: TileOrderInputProps) {
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
 
   useEffect(() => {
