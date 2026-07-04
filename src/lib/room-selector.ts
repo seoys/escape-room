@@ -1,6 +1,6 @@
 import { rooms } from '@/lib/rooms-data';
 import { Level, Room } from '@/types/room';
-import { getLevelFromAge, normalizeLevel } from '@/lib/age-group';
+import { getLevelFromAge, normalizeLevel } from '@/lib/level';
 
 export const LEVEL_COOKIE_KEY = 'player_level';
 

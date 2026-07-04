@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/store/gameStore';
 import { readSession, writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
-import { getLevelFromAge } from '@/lib/age-group';
+import { getLevelFromAge } from '@/lib/level';
 import { TOTAL_ROOMS } from '@/lib/constants';
 import { Level } from '@/types/room';
 

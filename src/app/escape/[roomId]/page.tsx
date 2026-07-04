@@ -5,7 +5,7 @@ import {
   LEVEL_COOKIE_KEY,
   getRoomsForLevel,
 } from '@/lib/room-selector';
-import { normalizeLevel } from '@/lib/age-group';
+import { normalizeLevel } from '@/lib/level';
 import { TOTAL_ROOMS } from '@/lib/constants';
 
 
