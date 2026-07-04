@@ -107,12 +107,36 @@ body {
   font-family: var(--font-serif);
   font-weight: 400;
   line-height: 1.75;
+  overflow: hidden;
+  position: relative;
 }
 
 .pretext-question-line {
   display: block;
   opacity: 0;
   animation: pretext-line-reveal 420ms ease-out forwards;
+  transition:
+    margin-left 180ms ease,
+    max-width 180ms ease;
+  will-change: margin-left, max-width;
+  z-index: 1;
+}
+
+.pretext-shadow-sweep {
+  position: absolute;
+  left: -18px;
+  top: 0;
+  width: 170px;
+  height: 56px;
+  border-radius: 999px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 28% 50%, rgba(232, 150, 90, 0.16), transparent 42%),
+    radial-gradient(circle at 58% 50%, rgba(0, 0, 0, 0.45), transparent 70%);
+  filter: blur(2px);
+  opacity: 0.85;
+  transition: transform 180ms ease;
+  z-index: 0;
 }
 
 /* ============================================================
