@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 
 interface TileOrderInputProps {
   tiles: string[];
-  value: string;
   onChange: (val: string) => void;
   disabled?: boolean;
 }
