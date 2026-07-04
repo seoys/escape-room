@@ -1,6 +1,11 @@
 import 'server-only';
 import { Room } from '@/types/room';
 
+// Type mix guideline (see docs/superpowers/specs/2026-07-04-level-system-and-puzzle-content-design.md):
+// 추리 and 넌센스 land slightly under their per-category guideline range across the
+// full 120-room set (14 and 9 respectively) — accepted intentionally, since padding
+// 추리 further would only repeat the existing "N people, one accuses" template rather
+// than add real variety.
 export const rooms: Room[] = [
 	// ==========================================
 	// Level 1 (10대 / 초등 고학년 수준) — 방 1~30
