@@ -789,7 +789,7 @@ export const rooms: Room[] = [
 	{
 		id: 79,
 		title: '시저 -2 암호',
-		question: '[서재의 기록]\n"FMSQC"는 원문의 각 글자를 알파벳 순서로 2칸 앞으로 이동해 만든 암호다.\n원문은? (대문자 5글자)',
+		question: '[서재의 기록]\n"FMSQC"는 원문의 각 글자를 알파벳 순서로 2칸 뒤로 이동해 만든 암호다.\n원문은? (대문자 5글자)',
 		answer: 'HOUSE',
 		hint: '각 글자를 +2 이동하세요.',
 		type: '암호',
