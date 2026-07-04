@@ -3,7 +3,7 @@ export interface StoredSession {
 	displayName?: string;
 	gender?: string;
 	age?: number;
-	ageGroup?: 'teen' | 'adult' | 'senior';
+	level?: 1 | 2 | 3 | 4;
 	host: string | null;
 	userAgent: string | null;
 	platform: string | null;

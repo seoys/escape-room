@@ -1,4 +1,4 @@
-export type AgeGroup = 'teen' | 'adult' | 'senior';
+export type Level = 1 | 2 | 3 | 4;
 
 export interface Room {
 	id: number;
@@ -8,8 +8,9 @@ export interface Room {
 	answer: string | string[];
 	hint: string | string[];
 	difficulty: number;
-	inputType?: 'text' | 'number' | 'password' | 'choice' | 'combo-lock';
+	inputType?: 'text' | 'number' | 'password' | 'choice' | 'combo-lock' | 'tile-order';
 	comboLength?: number;
+	tiles?: string[];
 }
 
 export interface GameState {
@@ -20,7 +21,7 @@ export interface GameState {
 	playerName: string;
 	playerGender?: string;
 	playerAge?: number;
-	ageGroup?: AgeGroup;
+	level?: Level;
 	startTime?: Date;
 	endTime?: Date;
 	host: string;
