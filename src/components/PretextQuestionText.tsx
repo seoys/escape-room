@@ -12,7 +12,7 @@ interface PretextQuestionTextProps {
 	className?: string;
 }
 
-const FONT = '16px "Noto Serif KR", "Playfair Display", serif';
+const FONT = '16px "Noto Sans KR", "Pretendard", sans-serif';
 const FALLBACK_WIDTH = 640;
 const MAX_LINES = 64;
 
