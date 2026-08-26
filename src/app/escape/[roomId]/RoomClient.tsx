@@ -336,16 +336,20 @@ export default function RoomClient({
 			<ParticleBackground />
 
 			{/* Background room image */}
-			<div
-				className="fixed inset-0 z-0 transition-opacity duration-1000"
-				style={{
-					backgroundImage: `url(/images/escape_room_${roomId}.png), url(/images/escape_room_25.png)`,
-					backgroundSize: 'cover',
-					backgroundPosition: 'center',
-					opacity: 0.08,
-					filter: 'grayscale(100%) contrast(150%) blur(4px)',
-				}}
-			/>
+			<div className="fixed inset-0 z-0 overflow-hidden">
+				<Image
+					src={`/images/escape_room_${Math.min(roomId, 25)}.png`}
+					alt=""
+					fill
+					quality={20}
+					sizes="100vw"
+					style={{
+						objectFit: 'cover',
+						opacity: 0.08,
+						filter: 'grayscale(100%) contrast(150%) blur(4px)',
+					}}
+				/>
+			</div>
 
 			{/* ── Toast Console logs ── */}
 			<div className="toast-container">

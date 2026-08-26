@@ -15,8 +15,8 @@
   --color-candle-amber: #e8965a;
   --color-candle-amber-dim: rgba(232, 150, 90, 0.15);
   --color-wine-red: #7a1f2b;
-  --font-serif: 'Noto Serif KR', 'Playfair Display', serif;
-  --font-display: 'Playfair Display', 'Noto Serif KR', serif;
+  --font-serif: 'Noto Sans KR', 'Pretendard', -apple-system, sans-serif;
+  --font-display: 'Noto Sans KR', 'Pretendard', -apple-system, sans-serif;
 }
 
 /* ============================================================
@@ -45,10 +45,6 @@ body {
    Home page key-drag background (kept from legacy, restyled)
    ============================================================ */
 .main-background {
-  background-image: url('/images/escape_room_main.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   width: 100vw;
   min-height: 100vh;
   position: relative;

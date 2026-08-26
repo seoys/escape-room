@@ -1,2 +1,2 @@
-const nextConfig = { images: { domains: ['localhost'], unoptimized: true } };
+const nextConfig = { images: { domains: ['localhost'] } };
 module.exports = nextConfig;
