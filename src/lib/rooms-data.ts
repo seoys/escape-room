@@ -1038,7 +1038,7 @@ const legacyRooms: Room[] = [
 
 // Rooms rewritten as image/visual puzzles live in src/lib/visual-rooms/. They replace
 // the text rooms with the same ids, so the merged list is kept sorted by id:
-// getRoomsForLevel and verifyAnswer index into it by position.
+// getGameRooms resolves the player's draw against it by id.
 export const rooms: Room[] = [...legacyRooms, ...visualRooms].sort(
 	(a, b) => a.id - b.id,
 );

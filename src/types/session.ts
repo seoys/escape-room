@@ -3,7 +3,6 @@ export interface StoredSession {
 	displayName?: string;
 	gender?: string;
 	age?: number;
-	level?: 1 | 2 | 3 | 4;
 	roomIds?: number[];
 	host: string | null;
 	userAgent: string | null;

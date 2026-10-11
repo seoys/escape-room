@@ -9,7 +9,7 @@ export default function FinishPage() {
 	const { startTime, endTime, hintsUsed } = useGameStore();
 	const [playerName, setPlayerName] = useState('');
 	const [topUsers, setTopUsers] = useState<
-		{ name: string; seconds: number; level?: number }[]
+		{ name: string; seconds: number }[]
 	>([]);
 	const [timeLabel, setTimeLabel] = useState('시간 정보 없음');
 	const [penaltyLabel, setPenaltyLabel] = useState('');
@@ -28,7 +28,6 @@ export default function FinishPage() {
 					sessions.slice(0, 5).map(session => ({
 						name: session.displayName || session.name.replace('escape_', ''),
 						seconds: session.seconds ?? 0,
-						level: session.level,
 					})),
 				);
 			} catch (error) {
@@ -163,11 +162,6 @@ export default function FinishPage() {
 											<span className="font-medium text-[#e8d9b0]">
 												{user.name}
 											</span>
-											{user.level && (
-												<span className="text-xs text-[#a38a4a]">
-													({user.level}레벨)
-												</span>
-											)}
 										</div>
 										<span className="text-slate-400">
 											{Math.floor(user.seconds / 60)}분{' '}

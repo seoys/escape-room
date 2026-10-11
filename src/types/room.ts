@@ -1,5 +1,3 @@
-export type Level = 1 | 2 | 3 | 4;
-
 export type GridCell = {
 	text?: string;
 	arrow?: 'up' | 'down' | 'left' | 'right';
@@ -98,7 +96,6 @@ export interface GameState {
 	playerName: string;
 	playerGender?: string;
 	playerAge?: number;
-	level?: Level;
 	startTime?: Date;
 	endTime?: Date;
 	host: string;

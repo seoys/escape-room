@@ -67,7 +67,6 @@ test('resetRunStorage keeps the player identity and device info', () => {
 		playerKey: 'escape_홍길동_male_15',
 		playerGender: 'male',
 		playerAge: '15',
-		playerLevel: '1',
 		userHost: '1.2.3.4',
 		userAgent: 'UA',
 		userPlatform: 'MacIntel',

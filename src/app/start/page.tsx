@@ -5,16 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/store/gameStore';
 import { readSession, writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
-import { getLevelFromAge } from '@/lib/level';
 import { TOTAL_ROOMS } from '@/lib/constants';
-import { Level } from '@/types/room';
-
-const LEVEL_LABELS: Record<Level, { label: string; desc: string; detail: string }> = {
-	1: { label: '제1관 [입문]', desc: '방 01 ~ 30', detail: '저택 초입의 가벼운 수수께끼들이 기다리고 있습니다.' },
-	2: { label: '제2관 [심화]', desc: '방 31 ~ 60', detail: '서재 깊은 곳, 조금 더 얽힌 단서들을 풀어야 합니다.' },
-	3: { label: '제3관 [고급]', desc: '방 61 ~ 90', detail: '지하실의 낡은 장치들이 정교한 추리를 요구합니다.' },
-	4: { label: '제4관 [최상급]', desc: '방 91 ~ 120', detail: '가장 깊은 곳, 저택 최후의 진실이 기다립니다.' },
-};
+import {
+	DEFAULT_ROOM_IDS,
+	gameRoomsCookie,
+	pickRoomIds,
+	validRoomIds,
+} from '@/lib/room-pool';
 
 const GENDER_OPTIONS = [
 	{ value: 'male', label: '남성' },
@@ -38,10 +35,6 @@ export default function StartPage() {
 	const { setCurrentRoom, setHintsRemaining } = useGameStore();
 
 	const parsedAge = parseInt(age, 10);
-	const level =
-		Number.isFinite(parsedAge) && parsedAge >= 8 && parsedAge <= 100
-			? getLevelFromAge(parsedAge)
-			: null;
 
 	// Terminal typing simulation logs
 	useEffect(() => {
@@ -117,7 +110,6 @@ export default function StartPage() {
 		setIsSubmitting(true);
 
 		const trimmedName = name.trim();
-		const currentLevel = getLevelFromAge(parsedAge);
 		const playerKey = `escape_${trimmedName}_${gender}_${parsedAge}`;
 
 		try {
@@ -125,9 +117,7 @@ export default function StartPage() {
 			localStorage.setItem('playerName', trimmedName);
 			localStorage.setItem('playerGender', gender);
 			localStorage.setItem('playerAge', parsedAge.toString());
-			localStorage.setItem('playerLevel', currentLevel.toString());
 			localStorage.setItem('playerKey', playerKey);
-			document.cookie = `player_level=${currentLevel}; path=/; max-age=2592000`;
 
 			const existingSession = await readSession(playerKey);
 
@@ -152,6 +142,10 @@ export default function StartPage() {
 				}
 
 				if (isSameUser) {
+					// Resume with the rooms drawn for this run (older sessions have none: rooms 1..30).
+					document.cookie = gameRoomsCookie(
+						validRoomIds(existingSession.roomIds) ?? DEFAULT_ROOM_IDS,
+					);
 					alert('이전에 남기신 발자취를 찾았습니다. 마지막으로 계셨던 방으로 안내합니다.');
 					const nextRoomId = Math.min(TOTAL_ROOMS, Number(existingSession.roomId) || 1);
 					setCurrentRoom(nextRoomId);
@@ -164,12 +158,16 @@ export default function StartPage() {
 			// so nothing from an earlier play on this browser carries over.
 			useGameStore.getState().resetRun();
 
+			// Draw this run's 30 rooms (random subset, random order) out of the pool.
+			const roomIds = pickRoomIds();
+			document.cookie = gameRoomsCookie(roomIds);
+
 			const payload: StoredSession = {
 				name: playerKey,
 				displayName: trimmedName,
 				gender,
 				age: parsedAge,
-				level: currentLevel,
+				roomIds,
 				host: localStorage.getItem('userHost'),
 				userAgent: localStorage.getItem('userAgent'),
 				platform: localStorage.getItem('userPlatform'),
@@ -190,8 +188,6 @@ export default function StartPage() {
 			setIsSubmitting(false);
 		}
 	};
-
-	const levelInfo = level ? LEVEL_LABELS[level] : null;
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden select-none" style={{ background: 'var(--color-bg)' }}>
@@ -318,15 +314,10 @@ export default function StartPage() {
 							</div>
 						</div>
 
-						{/* Age & Level */}
+						{/* Age */}
 						<div className="flex flex-col gap-2">
 							<div className="flex justify-between text-xs tracking-widest text-[#a38a4a]">
 								나이
-								{levelInfo && (
-									<span className="text-[#c9a24b] font-bold animate-badge-pop">
-										{levelInfo.label}
-									</span>
-								)}
 							</div>
 							<div className="relative">
 								<input
@@ -340,12 +331,6 @@ export default function StartPage() {
 									className="antique-input"
 								/>
 							</div>
-							{levelInfo && (
-								<div className="p-3 bg-[rgba(201,162,75,0.08)] border border-[rgba(201,162,75,0.2)] text-[11px] text-[#c9a24b]/80 leading-normal flex flex-col gap-1">
-									<div><strong>[안내될 방]:</strong> {levelInfo.desc}</div>
-									<div className="text-[#a38a4a]">{levelInfo.detail}</div>
-								</div>
-							)}
 						</div>
 
 						{/* Error reporting */}
