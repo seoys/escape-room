@@ -25,9 +25,15 @@ ENV NODE_ENV=production \
     PORT=10050 \
     HOSTNAME=0.0.0.0 \
     NEXT_TELEMETRY_DISABLED=1
-COPY --from=build --chown=node:node /app/.next/standalone ./
-COPY --from=build --chown=node:node /app/.next/static ./.next/static
-COPY --from=build --chown=node:node /app/public ./public
+COPY --from=build /app/.next/standalone ./
+COPY --from=build /app/.next/static ./.next/static
+COPY --from=build /app/public ./public
+# File modes in the build context are not guaranteed (the server walks all of public/
+# at startup), so make everything readable and hand the writable parts (.next, e.g. the
+# image optimization cache) to the runtime user.
+RUN mkdir -p .next/cache \
+    && chmod -R a+rX /app \
+    && chown -R node:node /app/.next /app/public
 USER node
 EXPOSE 10050
 CMD ["node", "server.js"]
