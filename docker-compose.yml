@@ -6,7 +6,8 @@ services:
         # Optional: set in the Portainer stack's environment variables.
         # Empty keeps the value from the repository's .env file.
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
-    image: escape-room:latest
+    # Built on the Docker host (no registry image), so never try to pull it.
+    pull_policy: build
     container_name: escape-room
     restart: unless-stopped
     ports:
