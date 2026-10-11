@@ -8,24 +8,24 @@ import { publicFileExists } from './helpers/public-file';
 type Expectation = { id: number; kind: string; inputType: string };
 
 const REPLACED: Expectation[] = [
+	{ id: 1, kind: 'symbol-rows', inputType: 'number' },
 	{ id: 2, kind: 'symbol-rows', inputType: 'number' },
-	{ id: 7, kind: 'symbol-rows', inputType: 'number' },
-	{ id: 12, kind: 'symbol-rows', inputType: 'number' },
-	{ id: 16, kind: 'symbol-rows', inputType: 'number' },
-	{ id: 20, kind: 'image', inputType: 'number' },
-	{ id: 26, kind: 'grid', inputType: 'number' },
-	{ id: 13, kind: 'image', inputType: 'choice' },
-	{ id: 22, kind: 'shape-matrix', inputType: 'choice' },
-	{ id: 27, kind: 'grid', inputType: 'number' },
-	{ id: 8, kind: 'image', inputType: 'number' },
-	{ id: 17, kind: 'image', inputType: 'choice' },
-	{ id: 23, kind: 'grid', inputType: 'text' },
-	{ id: 29, kind: 'grid', inputType: 'text' },
-	{ id: 4, kind: 'grid', inputType: 'text' },
-	{ id: 14, kind: 'note', inputType: 'text' },
-	{ id: 28, kind: 'note', inputType: 'text' },
-	{ id: 15, kind: 'statements', inputType: 'choice' },
-	{ id: 25, kind: 'note', inputType: 'choice' },
+	{ id: 3, kind: 'symbol-rows', inputType: 'number' },
+	{ id: 4, kind: 'image', inputType: 'number' },
+	{ id: 5, kind: 'grid', inputType: 'number' },
+	{ id: 6, kind: 'symbol-rows', inputType: 'number' },
+	{ id: 7, kind: 'grid', inputType: 'number' },
+	{ id: 8, kind: 'grid', inputType: 'text' },
+	{ id: 9, kind: 'grid', inputType: 'text' },
+	{ id: 10, kind: 'image', inputType: 'choice' },
+	{ id: 11, kind: 'note', inputType: 'text' },
+	{ id: 13, kind: 'grid', inputType: 'text' },
+	{ id: 15, kind: 'note', inputType: 'text' },
+	{ id: 16, kind: 'note', inputType: 'choice' },
+	{ id: 18, kind: 'image', inputType: 'choice' },
+	{ id: 19, kind: 'statements', inputType: 'choice' },
+	{ id: 28, kind: 'image', inputType: 'number' },
+	{ id: 30, kind: 'shape-matrix', inputType: 'choice' },
 ];
 
 test('rooms: 120 rooms, ids 1..120 contiguous and in order', () => {
@@ -57,9 +57,9 @@ for (const expected of REPLACED) {
 	});
 }
 
-test('room 11 is the image tile-order room', () => {
-	const room = rooms[10];
-	assert.equal(room.id, 11);
+test('room 24 is the image tile-order room', () => {
+	const room = rooms[23];
+	assert.equal(room.id, 24);
 	assert.equal(room.inputType, 'tile-order');
 	assert.ok(room.tileImages);
 });
@@ -75,7 +75,7 @@ test('every room (legacy and new) passes validateRoom', () => {
 });
 
 test('the remaining legacy rooms are untouched text rooms (no visual)', () => {
-	const replaced = new Set([...REPLACED.map(r => r.id), 11]);
+	const replaced = new Set([...REPLACED.map(r => r.id), 24]);
 	assert.equal(replaced.size, 19);
 	for (const room of rooms) {
 		if (!replaced.has(room.id))

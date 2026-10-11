@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { Noto_Serif_KR } from 'next/font/google';
+import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
 
-const notoSerif = Noto_Serif_KR({
+const notoSans = Noto_Sans_KR({
 	weight: ['400', '500', '700'],
 	subsets: ['latin'],
 	display: 'swap',
@@ -21,7 +21,7 @@ export default function RootLayout({
 	return (
 		<html lang="ko" suppressHydrationWarning>
 			<body
-				className={`${notoSerif.className} text-base`}
+				className={`${notoSans.className} text-base`}
 				suppressHydrationWarning
 			>
 				{children}

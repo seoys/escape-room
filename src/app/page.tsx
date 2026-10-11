@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -84,6 +85,15 @@ export default function Home() {
 
 	return (
 		<main className="main-background">
+			<Image
+				src="/images/escape_room_main.png"
+				alt=""
+				fill
+				priority
+				quality={65}
+				sizes="100vw"
+				className="object-cover"
+			/>
 			<div className="home-start-stage relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 text-center text-white">
 				<div className="home-start-copy">
 					<div className="text-[10px] tracking-[0.45em] text-[#c9a24b]/70">
