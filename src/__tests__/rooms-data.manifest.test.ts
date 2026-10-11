@@ -28,11 +28,34 @@ const REPLACED: Expectation[] = [
 	{ id: 30, kind: 'shape-matrix', inputType: 'choice' },
 ];
 
-test('rooms: 120 rooms, ids 1..120 contiguous and in order', () => {
-	assert.equal(rooms.length, 120);
+const ADDED: Expectation[] = [
+	{ id: 31, kind: 'grid', inputType: 'number' },
+	{ id: 32, kind: 'symbol-rows', inputType: 'number' },
+	{ id: 33, kind: 'image', inputType: 'number' },
+	{ id: 34, kind: 'grid', inputType: 'text' },
+	{ id: 35, kind: 'grid', inputType: 'text' },
+	{ id: 36, kind: 'note', inputType: 'text' },
+	{ id: 37, kind: 'shape-matrix', inputType: 'choice' },
+	{ id: 38, kind: 'note', inputType: 'choice' },
+	{ id: 39, kind: 'grid', inputType: 'text' },
+	{ id: 40, kind: 'grid', inputType: 'number' },
+	{ id: 41, kind: 'grid', inputType: 'text' },
+	{ id: 42, kind: 'note', inputType: 'combo-lock' },
+	{ id: 43, kind: 'note', inputType: 'text' },
+	{ id: 44, kind: 'note', inputType: 'text' },
+	{ id: 45, kind: 'note', inputType: 'number' },
+	{ id: 46, kind: 'note', inputType: 'number' },
+	{ id: 47, kind: 'note', inputType: 'text' },
+	{ id: 48, kind: 'note', inputType: 'number' },
+	{ id: 49, kind: 'note', inputType: 'choice' },
+	{ id: 50, kind: 'image', inputType: 'number' },
+];
+
+test('rooms: 50 rooms, ids 1..50 contiguous and in order', () => {
+	assert.equal(rooms.length, 50);
 	assert.deepEqual(
 		rooms.map(r => r.id),
-		Array.from({ length: 120 }, (_, i) => i + 1),
+		Array.from({ length: 50 }, (_, i) => i + 1),
 	);
 });
 
@@ -47,6 +70,16 @@ test('getGameRooms: the default draw is rooms 1..30 in id order', () => {
 
 for (const expected of REPLACED) {
 	test(`room ${expected.id} uses the ${expected.kind} visual with ${expected.inputType} input`, () => {
+		const room = rooms[expected.id - 1];
+		assert.equal(room.id, expected.id);
+		assert.equal(room.visual?.kind, expected.kind);
+		assert.equal(room.inputType, expected.inputType);
+		assert.equal(room.variants, undefined);
+	});
+}
+
+for (const expected of ADDED) {
+	test(`added room ${expected.id} uses the ${expected.kind} visual with ${expected.inputType} input`, () => {
 		const room = rooms[expected.id - 1];
 		assert.equal(room.id, expected.id);
 		assert.equal(room.visual?.kind, expected.kind);
@@ -73,10 +106,18 @@ test('every room (legacy and new) passes validateRoom', () => {
 });
 
 test('the remaining legacy rooms are untouched text rooms (no visual)', () => {
-	const replaced = new Set([...REPLACED.map(r => r.id), 24]);
-	assert.equal(replaced.size, 19);
+	const withVisual = new Set([
+		...REPLACED.map(r => r.id),
+		24,
+		...ADDED.map(r => r.id),
+	]);
+	assert.equal(withVisual.size, 39);
 	for (const room of rooms) {
-		if (!replaced.has(room.id))
+		if (!withVisual.has(room.id))
 			assert.equal(room.visual, undefined, `room ${room.id}`);
 	}
+	assert.deepEqual(
+		rooms.filter(r => !withVisual.has(r.id)).map(r => r.id),
+		[12, 14, 17, 20, 21, 22, 23, 25, 26, 27, 29],
+	);
 });

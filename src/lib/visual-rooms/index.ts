@@ -1,5 +1,9 @@
 import 'server-only';
 import { Room } from '@/types/room';
+import { extraGridRooms } from './extra-grid-rooms';
+import { extraMiscRooms } from './extra-misc-rooms';
+import { extraNoteRooms } from './extra-note-rooms';
+import { extraSymbolRooms } from './extra-symbol-rooms';
 import { gridRooms } from './grid-rooms';
 import { imageRooms } from './image-rooms';
 import { noteRooms } from './note-rooms';
@@ -7,10 +11,10 @@ import { shapeRooms } from './shape-rooms';
 import { statementRooms } from './statement-rooms';
 import { symbolRooms } from './symbol-rooms';
 
-// The sample rooms were authored (and are tested) under their original ids. This map
-// assigns each one to the Level 1 room it replaces after the Level 1 content rewrite:
-// sample id -> final room id. Matching rooms by type keeps Level 1's category mix:
-// 연산 1~6, 관찰 7~10, 암호 11/13/15, 추리 16/18/19, 타일배열 24, 도형 28/30.
+// The first 19 sample rooms were authored (and are tested) under their original ids.
+// This map assigns each one to the room it replaces: sample id -> final room id.
+// Matching rooms by type keeps the type mix: 연산 1~6, 관찰 7~10, 암호 11/13/15,
+// 추리 16/18/19, 타일배열 24, 도형 28/30.
 export const FINAL_ROOM_ID: Record<number, number> = {
 	2: 1,
 	7: 2,
@@ -33,7 +37,7 @@ export const FINAL_ROOM_ID: Record<number, number> = {
 	22: 30,
 };
 
-export const visualRooms: Room[] = [
+const remapped: Room[] = [
 	...symbolRooms,
 	...gridRooms,
 	...noteRooms,
@@ -46,3 +50,13 @@ export const visualRooms: Room[] = [
 		throw new Error(`no final room id for sample ${room.id}`);
 	return { ...room, id };
 });
+
+// Rooms 31~50 were authored directly under their final ids.
+const added: Room[] = [
+	...extraGridRooms,
+	...extraSymbolRooms,
+	...extraNoteRooms,
+	...extraMiscRooms,
+];
+
+export const visualRooms: Room[] = [...remapped, ...added];
