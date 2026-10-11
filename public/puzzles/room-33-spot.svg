@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 260" width="480" height="260">
+	<defs>
+		<g id="base">
+			<rect x="0" y="0" width="220" height="240" fill="#e9dcbc"/>
+			<rect x="0" y="180" width="220" height="60" fill="#8a6d3b"/>
+			<rect x="20" y="24" width="70" height="80" fill="#1d2a44" stroke="#2a2418" stroke-width="3"/>
+			<line x1="55" y1="24" x2="55" y2="104" stroke="#2a2418" stroke-width="3"/>
+			<line x1="20" y1="64" x2="90" y2="64" stroke="#2a2418" stroke-width="3"/>
+			<circle cx="73" cy="40" r="8" fill="#f6e6a0"/>
+			<rect x="30" y="150" width="100" height="10" fill="#5a4a2a"/>
+			<rect x="38" y="160" width="8" height="40" fill="#5a4a2a"/>
+			<rect x="114" y="160" width="8" height="40" fill="#5a4a2a"/>
+			<rect x="150" y="40" width="56" height="130" fill="#5a4a2a" stroke="#2a2418" stroke-width="2"/>
+			<rect x="156" y="48" width="8" height="30" fill="#c0392b"/>
+			<rect x="166" y="52" width="8" height="26" fill="#2f6db5"/>
+			<rect x="176" y="46" width="8" height="32" fill="#3f9b4c"/>
+			<rect x="156" y="100" width="8" height="30" fill="#e3c21b"/>
+			<rect x="166" y="104" width="8" height="26" fill="#c0392b"/>
+			<rect x="176" y="98" width="8" height="32" fill="#2f6db5"/>
+			<circle cx="125" cy="60" r="16" fill="#f4ead0" stroke="#2a2418" stroke-width="2"/>
+			<circle cx="125" cy="60" r="1.5" fill="#2a2418"/>
+			<rect x="104" y="98" width="36" height="36" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+			<rect x="109" y="103" width="26" height="26" fill="#f4ead0"/>
+			<rect x="40" y="205" width="120" height="30" fill="#7a2f2f" stroke="#2a2418" stroke-width="2"/>
+		</g>
+		<g id="candle">
+			<rect x="-3" y="-16" width="6" height="16" fill="#f4ead0" stroke="#2a2418" stroke-width="1.5"/>
+			<ellipse cx="0" cy="-21" rx="3" ry="5" fill="#e0a030"/>
+		</g>
+	</defs>
+	<rect width="480" height="260" fill="#cbb98f"/>
+	<g id="panel-left" transform="translate(10 10)">
+		<use href="#base"/>
+		<use href="#candle" x="50" y="150"/>
+		<use href="#candle" x="72" y="150"/>
+		<line x1="125" y1="60" x2="125" y2="48" stroke="#2a2418" stroke-width="2"/>
+		<line data-diff="2" x1="125" y1="60" x2="134" y2="60" stroke="#2a2418" stroke-width="2"/>
+		<circle data-diff="3" cx="122" cy="116" r="10" fill="#7a2f2f"/>
+		<circle cx="36" cy="44" r="2.5" fill="#f6e6a0"/>
+		<circle data-diff="4" cx="36" cy="88" r="2.5" fill="#f6e6a0"/>
+		<rect data-diff="5" x="70" y="205" width="4" height="30" fill="#e0a030"/>
+		<rect data-diff="5" x="100" y="205" width="4" height="30" fill="#e0a030"/>
+		<rect data-diff="5" x="130" y="205" width="4" height="30" fill="#e0a030"/>
+	</g>
+	<g id="panel-right" transform="translate(250 10)">
+		<use href="#base"/>
+		<use href="#candle" x="50" y="150"/>
+		<use href="#candle" x="72" y="150"/>
+		<use data-diff="1" href="#candle" x="94" y="150"/>
+		<line x1="125" y1="60" x2="125" y2="48" stroke="#2a2418" stroke-width="2"/>
+		<line data-diff="2" x1="125" y1="60" x2="116" y2="60" stroke="#2a2418" stroke-width="2"/>
+		<rect data-diff="3" x="112" y="106" width="20" height="20" fill="#7a2f2f"/>
+		<circle cx="36" cy="44" r="2.5" fill="#f6e6a0"/>
+		<rect data-diff="5" x="62" y="205" width="4" height="30" fill="#e0a030"/>
+		<rect data-diff="5" x="86" y="205" width="4" height="30" fill="#e0a030"/>
+		<rect data-diff="5" x="110" y="205" width="4" height="30" fill="#e0a030"/>
+		<rect data-diff="5" x="134" y="205" width="4" height="30" fill="#e0a030"/>
+	</g>
+	<g fill="none" stroke="#2a2418" stroke-width="3">
+		<rect x="10" y="10" width="220" height="240"/>
+		<rect x="250" y="10" width="220" height="240"/>
+	</g>
+</svg>
