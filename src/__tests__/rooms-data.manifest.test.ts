@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { rooms } from '@/lib/rooms-data';
-import { getRoomsForLevel } from '@/lib/room-selector';
+import { getGameRooms } from '@/lib/room-selector';
 import { validateRoom } from '@/lib/rooms-validation';
 import { publicFileExists } from './helpers/public-file';
 
@@ -36,15 +36,13 @@ test('rooms: 120 rooms, ids 1..120 contiguous and in order', () => {
 	);
 });
 
-test('rooms: each level still gets exactly 30 rooms in id order', () => {
-	for (const level of [1, 2, 3, 4] as const) {
-		const levelRooms = getRoomsForLevel(level);
-		assert.equal(levelRooms.length, 30, `level ${level}`);
-		assert.deepEqual(
-			levelRooms.map(r => r.id),
-			Array.from({ length: 30 }, (_, i) => (level - 1) * 30 + i + 1),
-		);
-	}
+test('getGameRooms: the default draw is rooms 1..30 in id order', () => {
+	const defaultRooms = getGameRooms(undefined);
+	assert.equal(defaultRooms.length, 30);
+	assert.deepEqual(
+		defaultRooms.map(r => r.id),
+		Array.from({ length: 30 }, (_, i) => i + 1),
+	);
 });
 
 for (const expected of REPLACED) {

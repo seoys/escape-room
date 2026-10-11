@@ -6,7 +6,7 @@ import { useGameStore } from '@/store/gameStore';
 import Image from 'next/image';
 import { writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
-import { ChoiceOption, ClientRoom, Level } from '@/types/room';
+import { ChoiceOption, ClientRoom } from '@/types/room';
 import { verifyAnswer } from '@/app/actions/game';
 import ComboLockInput from '@/components/ComboLockInput';
 import TileOrderInput from '@/components/TileOrderInput';
@@ -32,7 +32,7 @@ const NO_OPTIONS: ChoiceOption[] = [];
 interface RoomClientProps {
 	room: ClientRoom;
 	roomId: number;
-	level: Level;
+	roomIds: number[];
 	isLastRoom: boolean;
 }
 
@@ -45,7 +45,7 @@ interface Toast {
 export default function RoomClient({
 	room,
 	roomId,
-	level,
+	roomIds,
 	isLastRoom,
 }: RoomClientProps) {
 	const router = useRouter();
@@ -157,7 +157,7 @@ export default function RoomClient({
 					displayName: playerName,
 					gender: localStorage.getItem('playerGender') || undefined,
 					age: parseInt(localStorage.getItem('playerAge') || '', 10) || undefined,
-					level,
+					roomIds,
 					host: localStorage.getItem('userHost'),
 					userAgent: localStorage.getItem('userAgent'),
 					platform: localStorage.getItem('userPlatform'),
@@ -221,7 +221,7 @@ export default function RoomClient({
 		setIsSubmitting(true);
 
 		try {
-			const isValid = await verifyAnswer(roomId, answer, level, room.variantId);
+			const isValid = await verifyAnswer(roomId, answer, room.variantId);
 
 			if (isValid) {
 				const baseScore = 100 + room.difficulty * 25;
@@ -255,7 +255,7 @@ export default function RoomClient({
 						displayName: playerName,
 						gender: localStorage.getItem('playerGender') || undefined,
 						age: parseInt(localStorage.getItem('playerAge') || '', 10) || undefined,
-						level,
+						roomIds,
 						host: localStorage.getItem('userHost'),
 						userAgent: localStorage.getItem('userAgent'),
 						platform: localStorage.getItem('userPlatform'),
@@ -325,7 +325,7 @@ export default function RoomClient({
 					displayName: playerName,
 					gender: localStorage.getItem('playerGender') || undefined,
 					age: parseInt(localStorage.getItem('playerAge') || '', 10) || undefined,
-					level,
+					roomIds,
 					host: localStorage.getItem('userHost'),
 					userAgent: localStorage.getItem('userAgent'),
 					platform: localStorage.getItem('userPlatform'),
