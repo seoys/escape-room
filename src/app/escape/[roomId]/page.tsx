@@ -7,6 +7,7 @@ import {
 } from '@/lib/room-selector';
 import { normalizeLevel } from '@/lib/level';
 import { TOTAL_ROOMS } from '@/lib/constants';
+import { toClientRoom } from '@/lib/client-room';
 
 
 interface PageProps {
@@ -34,33 +35,12 @@ export default async function RoomPage({ params }: PageProps) {
     notFound();
   }
 
-  const shuffleTiles = (tiles: string[]): string[] => {
-    const arr = [...tiles];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  };
-
   const selectedVariant = room.variants?.length
     ? room.variants[Math.floor(Math.random() * room.variants.length)]
     : undefined;
-  const playableRoom = selectedVariant ?? room;
 
   // Sanitize: Security measure to remove answer from client payload
-  const sanitizedRoom = {
-    id: room.id,
-    variantId: selectedVariant?.variantId,
-    title: playableRoom.title,
-    question: playableRoom.question,
-    hint: playableRoom.hint,
-    type: playableRoom.type,
-    difficulty: playableRoom.difficulty,
-    inputType: playableRoom.inputType,
-    comboLength: playableRoom.comboLength,
-    tiles: playableRoom.tiles ? shuffleTiles(playableRoom.tiles) : undefined,
-  };
+  const sanitizedRoom = toClientRoom(room, selectedVariant);
   const isLastRoom = parsedRoomId === TOTAL_ROOMS;
 
   return (
