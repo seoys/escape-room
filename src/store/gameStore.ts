@@ -3,7 +3,16 @@ import { devtools } from 'zustand/middleware';
 import { GameState } from '@/types/room';
 import { getBrowserInfo, getIpAddress } from '@/lib/utils/userInfo';
 import { TOTAL_ROOMS } from '@/lib/constants';
-import { clearLockout } from '@/lib/lockout';
+import { resetRunStorage } from '@/lib/run-reset';
+
+const freshRunState = (startedAt: Date) => ({
+	currentRoom: 1,
+	hintsRemaining: 3,
+	hintsUsed: 0,
+	completedRooms: [],
+	startTime: startedAt,
+	endTime: undefined,
+});
 
 const getInitialHintsRemaining = () => {
 	if (typeof window === 'undefined') return 3;
@@ -26,6 +35,7 @@ const getInitialHintsUsed = () => {
 };
 interface GameStore extends GameState {
 	initGame: () => Promise<void>;
+	resetRun: () => void;
 	setCurrentRoom: (roomId: number) => void;
 	consumeHint: () => void;
 	completeRoom: (roomId: number) => void;
@@ -54,25 +64,23 @@ const store = set => ({
 		localStorage.setItem('userHost', host.toString());
 		localStorage.setItem('userAgent', browserInfo.userAgent);
 		localStorage.setItem('userPlatform', browserInfo.platform);
-		localStorage.setItem('startTime', new Date().toISOString());
-		localStorage.setItem('hintsRemaining', '3');
-		localStorage.setItem('hintsUsed', '0');
-		localStorage.setItem('score', '0');
-		localStorage.setItem('combo', '0');
-		localStorage.setItem('bestCombo', '0');
-		clearLockout(localStorage);
+		const startedAt = new Date();
+		resetRunStorage(localStorage, startedAt);
 		set({
-			currentRoom: 1,
-			hintsRemaining: 3,
-			hintsUsed: 0,
-			completedRooms: [],
-			startTime: new Date(),
-			endTime: undefined,
+			...freshRunState(startedAt),
 			playerName: '',
 			host: host,
 			userAgent: browserInfo.userAgent,
 			platform: browserInfo.platform,
 		});
+	},
+
+	// Start a brand-new run right now (clock, hints, score, lockout back to zero).
+	// Synchronous on purpose: starting must not wait for the IP lookup in initGame.
+	resetRun: () => {
+		const startedAt = new Date();
+		resetRunStorage(localStorage, startedAt);
+		set(freshRunState(startedAt));
 	},
 
 	setCurrentRoom: (roomId: number) => {

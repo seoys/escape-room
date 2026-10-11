@@ -160,6 +160,10 @@ export default function StartPage() {
 				}
 			}
 
+			// New run (no session to resume): restart the clock, hints, score and lockout
+			// so nothing from an earlier play on this browser carries over.
+			useGameStore.getState().resetRun();
+
 			const payload: StoredSession = {
 				name: playerKey,
 				displayName: trimmedName,
@@ -175,9 +179,6 @@ export default function StartPage() {
 			};
 
 			await writeSession(playerKey, payload);
-			localStorage.setItem('score', '0');
-			localStorage.setItem('combo', '0');
-			localStorage.setItem('bestCombo', '0');
 
 			setHintsRemaining(3);
 			setCurrentRoom(1);
