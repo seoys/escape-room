@@ -1,6 +1,13 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
+import {
+  backspaceSlot,
+  changeSlot,
+  fromSlots,
+  isComplete,
+  toSlots,
+} from '@/lib/combo-slots';
 
 interface ComboLockInputProps {
   length?: number;
@@ -8,14 +15,17 @@ interface ComboLockInputProps {
   onChange: (val: string) => void;
   onComplete?: () => void;
   disabled?: boolean;
+  // Keyboard shown on phones. Combination locks are digits, so numeric by default.
+  inputMode?: 'numeric' | 'text';
 }
 
-export default function ComboLockInput({ 
-  length = 4, 
-  value, 
-  onChange, 
-  onComplete, 
-  disabled 
+export default function ComboLockInput({
+  length = 4,
+  value,
+  onChange,
+  onComplete,
+  disabled,
+  inputMode = 'numeric',
 }: ComboLockInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -28,46 +38,31 @@ export default function ComboLockInput({
 
   const handleChange = (index: number, inputVal: string) => {
     if (disabled) return;
-    
-    // 숫자 또는 알파벳만 허용
-    const sanitizedVal = inputVal.replace(/[^0-9A-Za-z]/g, '');
-    const char = sanitizedVal.slice(-1); 
-    
-    const chars = value.split('').slice(0, length);
-    // 빈 슬롯 채우기
-    while(chars.length < length) chars.push('');
-    
-    if (char) {
-      chars[index] = char.toUpperCase();
-    } else {
-      chars[index] = '';
-    }
-    
-    const newValue = chars.join('');
-    onChange(newValue);
+
+    const result = changeSlot(toSlots(value, length), index, inputVal);
+    onChange(fromSlots(result.slots));
 
     // 다음 칸으로 포커스 이동
-    if (char && index < length - 1) {
-      inputRefs.current[index + 1]?.focus();
+    if (result.focus !== null) {
+      inputRefs.current[result.focus]?.focus();
     }
 
     // 모두 채워졌다면 자동 완성 콜백 호출
-    if (chars.filter(c => c !== '').length === length) {
+    if (isComplete(result.slots)) {
       onComplete?.();
     }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (disabled) return;
-    
+
     if (e.key === 'Backspace') {
-      const chars = value.split('');
-      if (!chars[index] && index > 0) {
+      const result = backspaceSlot(toSlots(value, length), index);
+      if (result) {
         // 현재 슬롯이 비어있다면 지울 때 이전 슬롯으로 이동 및 삭제
         e.preventDefault();
-        inputRefs.current[index - 1]?.focus();
-        chars[index - 1] = '';
-        onChange(chars.join(''));
+        inputRefs.current[result.focus]?.focus();
+        onChange(fromSlots(result.slots));
       }
     } else if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -78,22 +73,20 @@ export default function ComboLockInput({
     }
   };
 
-  const getValueAt = (i: number) => {
-    return value[i] || '';
-  };
+  const slots = toSlots(value, length);
 
   return (
     <div className="flex gap-2 sm:gap-3 justify-center items-center py-4">
-      {Array.from({ length }).map((_, i) => (
+      {slots.map((slot, i) => (
         <input
           key={i}
           ref={(el) => {
             inputRefs.current[i] = el;
           }}
           type="text"
-          inputMode="text"
+          inputMode={inputMode}
           maxLength={2}
-          value={getValueAt(i)}
+          value={slot}
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           disabled={disabled}

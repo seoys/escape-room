@@ -143,8 +143,26 @@ test('room 45: with the 3rd a Sunday, the third Wednesday is the answer', () => 
 	assert.equal(String(wednesdays[2]), note(45).answer);
 });
 
-test('room 46: hidden faces are 7 minus each visible face and sum to the answer', () => {
-	const visible = [4, 2, 3];
+test('room 46: the visible faces can meet at a die corner, and the hidden faces sum to the answer', () => {
+	const match = /위 (\d) · 앞 (\d) · 오른쪽 (\d)/.exec(
+		noteLinesOf(note(46)).join(' '),
+	);
+	assert.ok(match, 'visible faces line not found');
+	const visible = [match[1], match[2], match[3]].map(Number);
+	assert.ok(visible.every(face => face >= 1 && face <= 6));
+	assert.equal(new Set(visible).size, 3, 'faces must differ');
+	// opposite faces add up to 7, so two of them can never be visible together
+	for (const [i, j] of [
+		[0, 1],
+		[0, 2],
+		[1, 2],
+	]) {
+		assert.notEqual(
+			visible[i] + visible[j],
+			7,
+			`faces ${visible[i]} and ${visible[j]} are opposite`,
+		);
+	}
 	assert.equal(
 		String(visible.reduce((sum, face) => sum + (7 - face), 0)),
 		note(46).answer,

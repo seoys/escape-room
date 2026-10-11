@@ -5,8 +5,7 @@ import { validateRoom } from '@/lib/rooms-validation';
 import { publicFileExists } from './helpers/public-file';
 import { roomById } from './helpers/find-room';
 import { ShapeCell, ShapeName } from '@/types/room';
-import fs from 'node:fs';
-import path from 'node:path';
+import { SPOT_DIFFERENCE_COUNT } from './helpers/spot-differences';
 
 const byId = (id: number) => roomById(extraMiscRooms, id);
 
@@ -25,18 +24,8 @@ test('extra misc rooms: ids 33, 37, 50 pass validateRoom (files exist)', () => {
 	}
 });
 
-test('room 33: the answer matches the number of marked differences in the drawing', () => {
-	const room = byId(33);
-	assert.equal(room.visual?.kind, 'image');
-	if (room.visual?.kind !== 'image') return;
-	const svg = fs.readFileSync(
-		path.join(process.cwd(), 'public', room.visual.src),
-		'utf8',
-	);
-	const marks = new Set(
-		[...svg.matchAll(/data-diff="(\d)"/g)].map(m => m[1]),
-	);
-	assert.equal(String(marks.size), room.answer);
+test('room 33: the answer matches the number of differences between the two drawings', () => {
+	assert.equal(String(SPOT_DIFFERENCE_COUNT), byId(33).answer);
 });
 
 test('room 37: each row uses every shape once with row-number many shapes; the answer option completes it', () => {

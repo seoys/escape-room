@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import {
+	SPOT_DIFFERENCES,
+	SPOT_DIFFERENCE_COUNT,
+} from './helpers/spot-differences';
 
 const read = (name: string) =>
 	fs.readFileSync(
@@ -36,21 +40,20 @@ for (const name of ['room-33-spot.svg', 'room-50-squares.svg']) {
 	});
 }
 
-test('room-33-spot.svg: the two panels differ in exactly 5 marked places', () => {
+test('room-33-spot.svg: the panels differ exactly where the test table says, and the file does not label them', () => {
 	const svg = read('room-33-spot.svg');
+	assert.ok(
+		!svg.includes('data-diff'),
+		'the shipped svg must not mark the differences',
+	);
 	const left = panelLines(svg, 'panel-left', '<g id="panel-right"');
 	const right = panelLines(svg, 'panel-right', '<g fill="none"');
-	const onlyLeft = left.filter(line => !right.includes(line));
-	const onlyRight = right.filter(line => !left.includes(line));
-	const differing = [...onlyLeft, ...onlyRight];
-	assert.ok(differing.length > 0);
-	for (const line of differing) {
-		assert.match(line, /data-diff="[1-5]"/, `unmarked difference: ${line}`);
-	}
-	const marks = new Set(
-		differing.map(line => /data-diff="([1-5])"/.exec(line)![1]),
-	);
-	assert.deepEqual([...marks].sort(), ['1', '2', '3', '4', '5']);
+	const differing = [
+		...left.filter(line => !right.includes(line)),
+		...right.filter(line => !left.includes(line)),
+	].sort();
+	assert.deepEqual(differing, Object.keys(SPOT_DIFFERENCES).sort());
+	assert.equal(SPOT_DIFFERENCE_COUNT, 5);
 });
 
 test('room-50-squares.svg: a 3x3 grid hides 14 squares (9 + 4 + 1)', () => {
