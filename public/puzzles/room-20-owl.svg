@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 260" width="480" height="260">
+	<defs>
+		<marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+			<path d="M0 0L10 5L0 10Z" fill="#2a2418"/>
+		</marker>
+		<g id="boy">
+			<circle cx="0" cy="-126" r="14" fill="#e8c9a0" stroke="#2a2418" stroke-width="2"/>
+			<rect x="-15" y="-112" width="30" height="72" fill="#5a4a2a"/>
+			<rect x="-12" y="-40" width="10" height="40" fill="#2a2418"/>
+			<rect x="2" y="-40" width="10" height="40" fill="#2a2418"/>
+		</g>
+		<g id="owl">
+			<ellipse cx="0" cy="-15" rx="12" ry="15" fill="#8a6d3b" stroke="#2a2418" stroke-width="2"/>
+			<circle cx="-4" cy="-20" r="3.5" fill="#ffffff"/>
+			<circle cx="4" cy="-20" r="3.5" fill="#ffffff"/>
+			<circle cx="-4" cy="-20" r="1.5" fill="#2a2418"/>
+			<circle cx="4" cy="-20" r="1.5" fill="#2a2418"/>
+			<path d="M-2 -13L2 -13L0 -9Z" fill="#e0a030"/>
+		</g>
+	</defs>
+	<rect width="480" height="260" fill="#f4ead0"/>
+	<line x1="10" y1="230" x2="470" y2="230" stroke="#2a2418" stroke-width="3"/>
+
+	<use href="#boy" transform="translate(80 230)"/>
+	<use href="#owl" transform="translate(80 90)"/>
+	<line x1="40" y1="60" x2="40" y2="230" stroke="#2a2418" stroke-width="2" marker-start="url(#arr)" marker-end="url(#arr)"/>
+	<line x1="40" y1="60" x2="66" y2="60" stroke="#2a2418" stroke-width="1" stroke-dasharray="4 3"/>
+	<text x="12" y="150" font-size="18" font-family="sans-serif" fill="#2a2418">170</text>
+
+	<use href="#boy" transform="translate(240 230)"/>
+	<use href="#owl" transform="translate(292 230)"/>
+	<line x1="292" y1="200" x2="350" y2="200" stroke="#2a2418" stroke-width="1" stroke-dasharray="4 3"/>
+	<line x1="254" y1="90" x2="350" y2="90" stroke="#2a2418" stroke-width="1" stroke-dasharray="4 3"/>
+	<line x1="338" y1="90" x2="338" y2="200" stroke="#2a2418" stroke-width="2" marker-start="url(#arr)" marker-end="url(#arr)"/>
+	<text x="346" y="150" font-size="18" font-family="sans-serif" fill="#2a2418">110</text>
+
+	<use href="#owl" transform="translate(420 230)"/>
+	<line x1="446" y1="200" x2="446" y2="230" stroke="#2a2418" stroke-width="2" marker-start="url(#arr)" marker-end="url(#arr)"/>
+	<text x="452" y="222" font-size="24" font-weight="bold" font-family="sans-serif" fill="#8b2a1d">?</text>
+</svg>

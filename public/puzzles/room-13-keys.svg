@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" width="480" height="340">
+	<defs>
+		<g id="key-base">
+			<circle cx="14" cy="5" r="12" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+			<circle cx="14" cy="5" r="4" fill="#f4ead0"/>
+			<rect x="26" y="0" width="84" height="10" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		</g>
+	</defs>
+	<rect width="480" height="340" fill="#f4ead0"/>
+
+	<path d="M205 60V40a35 35 0 0 1 70 0V60" fill="none" stroke="#3a3020" stroke-width="10"/>
+	<rect x="170" y="60" width="140" height="110" rx="10" fill="#8a7a52" stroke="#3a3020" stroke-width="4"/>
+	<g transform="translate(198 100)" fill="#000000">
+		<rect x="0" y="0" width="84" height="10"/>
+		<rect x="18" y="10" width="8" height="16"/>
+		<rect x="34" y="10" width="8" height="8"/>
+		<rect x="50" y="10" width="8" height="24"/>
+		<rect x="66" y="10" width="8" height="8"/>
+	</g>
+
+	<g transform="translate(60 215)">
+		<use href="#key-base"/>
+		<rect x="44" y="10" width="8" height="16" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="60" y="10" width="8" height="8" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="76" y="10" width="8" height="24" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="92" y="10" width="8" height="16" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<text x="-40" y="14" font-size="24" font-weight="bold" font-family="sans-serif" fill="#2a2418">A</text>
+	</g>
+	<g transform="translate(270 215)">
+		<use href="#key-base"/>
+		<rect x="44" y="10" width="8" height="8" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="60" y="10" width="8" height="16" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="76" y="10" width="8" height="24" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="92" y="10" width="8" height="8" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<text x="-40" y="14" font-size="24" font-weight="bold" font-family="sans-serif" fill="#2a2418">B</text>
+	</g>
+	<g transform="translate(60 285)">
+		<use href="#key-base"/>
+		<rect x="44" y="10" width="8" height="16" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="60" y="10" width="8" height="8" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="76" y="10" width="8" height="24" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="92" y="10" width="8" height="8" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<text x="-40" y="14" font-size="24" font-weight="bold" font-family="sans-serif" fill="#2a2418">C</text>
+	</g>
+	<g transform="translate(270 285)">
+		<use href="#key-base"/>
+		<rect x="44" y="10" width="8" height="16" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="60" y="10" width="8" height="24" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="76" y="10" width="8" height="8" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<rect x="92" y="10" width="8" height="8" fill="#c9a24b" stroke="#2a2418" stroke-width="2"/>
+		<text x="-40" y="14" font-size="24" font-weight="bold" font-family="sans-serif" fill="#2a2418">D</text>
+	</g>
+</svg>

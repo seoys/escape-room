@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 270" width="480" height="270">
+	<rect width="480" height="270" fill="#f4ead0"/>
+	<g stroke-width="6" stroke-linecap="round">
+		<line x1="50" y1="135" x2="170" y2="65" stroke="#c0392b"/>
+		<line x1="50" y1="135" x2="170" y2="205" stroke="#2f6db5"/>
+		<line x1="170" y1="65" x2="300" y2="30" stroke="#c0392b"/>
+		<line x1="170" y1="65" x2="300" y2="120" stroke="#2f6db5"/>
+		<line x1="170" y1="205" x2="300" y2="120" stroke="#2f6db5"/>
+		<line x1="170" y1="205" x2="300" y2="220" stroke="#c0392b"/>
+		<line x1="300" y1="30" x2="430" y2="50" stroke="#2f6db5"/>
+		<line x1="300" y1="120" x2="430" y2="50" stroke="#2f6db5"/>
+		<line x1="300" y1="120" x2="430" y2="135" stroke="#c0392b"/>
+		<line x1="300" y1="220" x2="430" y2="220" stroke="#c0392b"/>
+	</g>
+	<g font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#2a2418" stroke="#f4ead0" stroke-width="3" paint-order="stroke">
+		<text x="110" y="104">빨강</text>
+		<text x="110" y="174">파랑</text>
+		<text x="235" y="44">빨강</text>
+		<text x="235" y="96">파랑</text>
+		<text x="235" y="166">파랑</text>
+		<text x="235" y="216">빨강</text>
+		<text x="365" y="38">파랑</text>
+		<text x="365" y="82">파랑</text>
+		<text x="365" y="124">빨강</text>
+		<text x="365" y="216">빨강</text>
+	</g>
+	<g fill="#f4ead0" stroke="#2a2418" stroke-width="2">
+		<circle cx="50" cy="135" r="20"/>
+		<circle cx="170" cy="65" r="14"/>
+		<circle cx="170" cy="205" r="14"/>
+		<circle cx="300" cy="30" r="14"/>
+		<circle cx="300" cy="120" r="14"/>
+		<circle cx="300" cy="220" r="14"/>
+	</g>
+	<g fill="#e8c9a0" stroke="#2a2418" stroke-width="2">
+		<circle cx="430" cy="50" r="18"/>
+		<circle cx="430" cy="135" r="18"/>
+		<circle cx="430" cy="220" r="18"/>
+	</g>
+	<g font-family="sans-serif" font-weight="bold" text-anchor="middle" fill="#2a2418">
+		<text x="50" y="139" font-size="12">입구</text>
+		<text x="430" y="57" font-size="18">1</text>
+		<text x="430" y="142" font-size="18">2</text>
+		<text x="430" y="227" font-size="18">3</text>
+	</g>
+</svg>
