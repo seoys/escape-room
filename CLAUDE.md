@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` — production build; run before committing non-trivial changes to `rooms-data.ts` or UI
 - `pnpm start` — serve the production build on port 10050 (mirrors the PM2 process)
 - `pnpm lint` — `next lint`; required before opening a PR
+- Docker / Portainer: `docker-compose.yml` + `Dockerfile` at the repo root (Portainer "Repository" stack, ref `refs/heads/main`, compose path `docker-compose.yml`). The image builds with `BUILD_STANDALONE=true` (`next.config.js` → `output: 'standalone'`) and serves on port 10050; PM2 (`eco.config.js`) is unaffected. Optional stack env vars: `NEXT_PUBLIC_API_URL` (build-time, empty keeps the tracked `.env` value), `HOST_PORT`.
 - `pnpm format` / `pnpm format:check` — Prettier over ts/tsx/js/jsx/json/md
 - `pnpm test` — unit tests (`node:test` + `tsx`, files in `src/__tests__/`): room data integrity, puzzle logic, client-payload sanitizing, renderer markup
 

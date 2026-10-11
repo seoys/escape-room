@@ -1,0 +1,25 @@
+# Keep the build context small. Do NOT ignore .env: `next build` reads NEXT_PUBLIC_* from it.
+node_modules
+.next
+.pnpm-store
+.git
+.gitignore
+.DS_Store
+*.tsbuildinfo
+
+# local tooling and notes
+.claude
+.cursor
+.cursorrules
+.serena
+.superpowers
+.vscode
+docs
+md
+mcp
+
+# process manager / docs not needed in the image
+eco.config.js
+Dockerfile
+docker-compose.yml
+.dockerignore

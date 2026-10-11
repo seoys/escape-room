@@ -1,0 +1,23 @@
+services:
+  escape-room:
+    build:
+      context: .
+      args:
+        # Optional: set in the Portainer stack's environment variables.
+        # Empty keeps the value from the repository's .env file.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+    image: escape-room:latest
+    container_name: escape-room
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-10050}:10050"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:10050/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
