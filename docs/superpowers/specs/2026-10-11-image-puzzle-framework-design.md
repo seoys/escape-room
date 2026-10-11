@@ -43,7 +43,7 @@ type PuzzleVisual =
 type GridCell = { text?: string; arrow?: 'up' | 'down' | 'left' | 'right'; mark?: 'hidden' | 'highlight' };
 type SymbolRow = { items: SymbolItem[]; value?: string };   // value가 없으면 풀어야 할 줄(?)
 type SymbolItem = { glyph?: string; color?: string; op?: '+' | '-' | '×' | '=' };
-type ShapeCell = { marks: { shape: 'circle' | 'square' | 'triangle' | 'diamond' | 'heart' | 'star'; filled: boolean; slot: number }[] };
+type ShapeCell = { marks: { shape: 'circle' | 'square' | 'triangle' | 'diamond'; filled: boolean; slot: number }[] };
 type ChoiceOption = { value: string; label?: string; image?: string; cell?: ShapeCell };
 ```
 
@@ -55,7 +55,7 @@ type ChoiceOption = { value: string; label?: string; image?: string; cell?: Shap
 
 | 파일 | 역할 |
 | --- | --- |
-| `PuzzleVisual.tsx` | `visual.kind`에 따라 아래 컴포넌트를 선택해 렌더링 |
+| `PuzzleVisualView.tsx` | `visual.kind`에 따라 아래 컴포넌트를 선택해 렌더링 |
 | `ImageVisual.tsx` | `next/image`로 일러스트 표시 |
 | `GridVisual.tsx` | 글자·숫자 격자. 화살표, 숨김/강조 칸 지원 |
 | `NoteVisual.tsx` | 일기 쪽지, 단어 목록, 경고문 카드 |
@@ -113,7 +113,7 @@ type ChoiceOption = { value: string; label?: string; image?: string; cell?: Shap
 
 ### 6. 검증
 
-- 자동 테스트 harness가 없다. 검증 스크립트로 모든 문항의 `visual`·`options`·`tileImages` 정합성(정답이 보기에 포함됨, 타일 id 일치, 이미지 파일 존재)을 검사한다. 실행 방식(devDependency `tsx` 추가 여부)은 구현 계획에서 정한다.
+- 자동 검증은 `pnpm test`(`node:test` + `tsx`, `src/__tests__/`)로 한다. `validateRoom` 정합성 검사, `toClientRoom`의 정답 비노출, 렌더러 정적 마크업, 방별 퍼즐 논리(수식 유일해, 아크로스틱, 진술 추리, 화살표 경로 등)를 포함한다.
 - `pnpm lint`, `pnpm build`를 통과해야 한다.
 - dev 서버에서 교체한 19개 방을 직접 풀어, 정답 처리와 오답 처리, 힌트, 모바일 폭 표시를 확인한다.
 - 클라이언트로 전달되는 RSC 페이로드에 `answer`가 없는지 확인한다.
