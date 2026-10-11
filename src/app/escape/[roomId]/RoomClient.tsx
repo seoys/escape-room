@@ -6,14 +6,18 @@ import { useGameStore } from '@/store/gameStore';
 import Image from 'next/image';
 import { writeSession } from '@/lib/api/redisClient';
 import { StoredSession } from '@/types/session';
-import { ClientRoom, Level } from '@/types/room';
+import { ChoiceOption, ClientRoom, Level } from '@/types/room';
 import { verifyAnswer } from '@/app/actions/game';
 import ComboLockInput from '@/components/ComboLockInput';
 import TileOrderInput from '@/components/TileOrderInput';
+import ChoiceInput from '@/components/ChoiceInput';
+import PuzzleVisualView from '@/components/puzzle-visuals/PuzzleVisualView';
 import SpeedrunTimer from '@/components/SpeedrunTimer';
 import ParticleBackground from '@/components/ParticleBackground';
 import PretextQuestionText from '@/components/PretextQuestionText';
 import { TOTAL_ROOMS } from '@/lib/constants';
+
+const NO_OPTIONS: ChoiceOption[] = [];
 
 interface RoomClientProps {
 	room: ClientRoom;
@@ -497,6 +501,8 @@ export default function RoomClient({
 							/>
 						</div>
 
+						<PuzzleVisualView visual={room.visual} />
+
 						{/* Target image (Stage 10 spec) */}
 						{roomId === 10 && (
 							<div
@@ -543,6 +549,13 @@ export default function RoomClient({
 							) : room.inputType === 'tile-order' ? (
 								<TileOrderInput
 									tiles={room.tiles || []}
+									tileImages={room.tileImages}
+									onChange={setAnswer}
+									disabled={isSubmitting}
+								/>
+							) : room.inputType === 'choice' ? (
+								<ChoiceInput
+									options={room.options ?? NO_OPTIONS}
 									onChange={setAnswer}
 									disabled={isSubmitting}
 								/>
