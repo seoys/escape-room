@@ -56,3 +56,17 @@ test('StatementsVisual shows every speaker name and statement', () => {
 		assert.ok(html.includes(text), text);
 	}
 });
+
+test('NoteVisual enlarges braille cells so the dot patterns can be told apart', () => {
+	const html = renderToStaticMarkup(<NoteVisual lines={['⠁ A · ⠃ B']} />);
+	assert.match(html, /<span[^>]*text-3xl[^>]*>⠁<\/span>/);
+	assert.match(html, /<span[^>]*text-3xl[^>]*>⠃<\/span>/);
+	assert.ok(html.includes('A'));
+	assert.ok(!/<span[^>]*text-3xl[^>]*>A<\/span>/.test(html));
+});
+
+test('NoteVisual leaves lines without braille as plain text', () => {
+	const html = renderToStaticMarkup(<NoteVisual lines={['평범한 줄']} />);
+	assert.ok(!html.includes('text-3xl'));
+	assert.match(html, /평범한 줄/);
+});

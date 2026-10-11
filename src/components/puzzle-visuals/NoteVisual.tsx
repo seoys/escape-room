@@ -10,6 +10,28 @@ const BORDER_BY_STYLE: Record<NonNullable<NoteVisualProps['style']>, string> = {
 	warning: '2px solid #8b2a1d',
 };
 
+const BRAILLE = /([⠀-⣿]+)/;
+
+// Braille cells are tiny at body size; draw them large so the dot patterns can be read.
+function NoteLine({ text }: { text: string }) {
+	return (
+		<>
+			{text.split(BRAILLE).map((part, index) =>
+				BRAILLE.test(part) ? (
+					<span
+						key={index}
+						className="align-middle text-3xl leading-none"
+					>
+						{part}
+					</span>
+				) : (
+					part
+				),
+			)}
+		</>
+	);
+}
+
 export default function NoteVisual({
 	title,
 	lines,
@@ -36,7 +58,7 @@ export default function NoteVisual({
 						key={index}
 						className={`border-b border-[rgba(60,42,20,0.18)] py-1 text-sm md:text-base ${style === 'diary' ? 'italic' : ''}`}
 					>
-						{line}
+						<NoteLine text={line} />
 					</li>
 				))}
 			</ul>
