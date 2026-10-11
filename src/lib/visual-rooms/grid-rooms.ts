@@ -81,7 +81,7 @@ export const gridRooms: Room[] = [
 				[{ text: '2' }, { text: '6' }],
 				[{ text: '3' }, { text: '12' }],
 				[{ text: '4' }, { text: '20' }],
-				[{ text: '5' }, { text: '30', mark: 'hidden' }],
+				[{ text: '5' }, { mark: 'hidden' }],
 			],
 		},
 	},

@@ -49,22 +49,34 @@ export const symbolRooms: Room[] = [
 			kind: 'symbol-rows',
 			rows: [
 				symRow(
-					[{ color: RED }, { color: YELLOW }, { color: BLUE }],
+					[
+						{ color: RED, label: '빨강' },
+						{ color: YELLOW, label: '노랑' },
+						{ color: BLUE, label: '파랑' },
+					],
 					'135',
 				),
 				symRow(
-					[{ color: ORANGE }, { color: GREEN }, { color: RED }],
+					[
+						{ color: ORANGE, label: '주황' },
+						{ color: GREEN, label: '초록' },
+						{ color: RED, label: '빨강' },
+					],
 					'241',
 				),
 				symRow(
-					[{ color: YELLOW }, { color: ORANGE }, { color: BLUE }],
+					[
+						{ color: YELLOW, label: '노랑' },
+						{ color: ORANGE, label: '주황' },
+						{ color: BLUE, label: '파랑' },
+					],
 					'325',
 				),
 				symRow([
-					{ color: GREEN },
-					{ color: BLUE },
-					{ color: RED },
-					{ color: ORANGE },
+					{ color: GREEN, label: '초록' },
+					{ color: BLUE, label: '파랑' },
+					{ color: RED, label: '빨강' },
+					{ color: ORANGE, label: '주황' },
 				]),
 			],
 		},

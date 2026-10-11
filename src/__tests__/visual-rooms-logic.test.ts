@@ -96,6 +96,16 @@ test('room 15: exactly one statement is false for exactly one suspect — the an
 	}
 });
 
+test('room 22: hints describe fill by column, matching the picture (hollow cells sit in the middle column, not a row)', () => {
+	const room = find(shapeRooms, 22);
+	const hints = Array.isArray(room.hint) ? room.hint : [room.hint];
+	assert.ok(
+		!hints.join(' ').includes('가운데 줄'),
+		'the middle row mixes filled and hollow shapes',
+	);
+	assert.ok(hints.join(' ').includes('가운데 칸'));
+});
+
 test('room 22: rows fix the shape, columns fix count and fill; the answer option completes the rule', () => {
 	const room = find(shapeRooms, 22);
 	assert.equal(room.visual?.kind, 'shape-matrix');

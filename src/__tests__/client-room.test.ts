@@ -53,6 +53,30 @@ test('toClientRoom forwards visual, options and tileImages and shuffles a tile c
 	assert.deepEqual(room.tiles, ['A', 'B', 'C']);
 });
 
+test('toClientRoom strips the text of hidden grid cells so a masked answer never ships', () => {
+	const gridRoom: Room = {
+		...room,
+		inputType: 'number',
+		tiles: undefined,
+		tileImages: undefined,
+		visual: {
+			kind: 'grid',
+			rows: [[{ text: '5' }, { text: '99-HIDDEN', mark: 'hidden' }]],
+		},
+	};
+	const client = toClientRoom(gridRoom, undefined);
+	assert.ok(!JSON.stringify(client).includes('99-HIDDEN'));
+	assert.deepEqual(client.visual, {
+		kind: 'grid',
+		rows: [[{ text: '5' }, { mark: 'hidden' }]],
+	});
+	assert.equal(
+		gridRoom.visual?.kind === 'grid' && gridRoom.visual.rows[0][1].text,
+		'99-HIDDEN',
+		'the server-side room must not be mutated',
+	);
+});
+
 test('toClientRoom uses the selected variant fields and variantId', () => {
 	const client = toClientRoom(room, room.variants![0], reverse);
 	assert.equal(client.id, 3);

@@ -44,13 +44,19 @@ function Item({ item }: { item: SymbolItem }) {
 		return (
 			<span
 				role="img"
-				aria-label="색깔 등불"
-				className="inline-block h-7 w-7 rounded-full"
+				aria-label={`${item.label ?? '색깔'} 등불`}
+				className="inline-flex h-7 w-7 items-center justify-center rounded-full"
 				style={{
 					background: item.color,
 					border: '2px solid rgba(255,255,255,0.35)',
 				}}
-			/>
+			>
+				{item.label && (
+					<span className="text-[10px] font-bold leading-none text-white">
+						{[...item.label][0]}
+					</span>
+				)}
+			</span>
 		);
 	}
 	if (item.op)

@@ -52,6 +52,16 @@ test('SymbolRowsVisual draws colored dots and an optional clock face', () => {
 	assert.match(html, /data-background="clock"/);
 });
 
+test('SymbolRowsVisual names a labelled lamp in its aria-label and shows the initial', () => {
+	const html = renderToStaticMarkup(
+		<SymbolRowsVisual
+			rows={[symRow([{ color: '#c0392b', label: '빨강' }], '1')]}
+		/>,
+	);
+	assert.match(html, /aria-label="빨강 등불"/);
+	assert.match(html, />빨</);
+});
+
 test('ShapeCellView draws one element per mark at the slot position', () => {
 	const html = renderToStaticMarkup(
 		<ShapeCellView cell={shapeCell('circle', true, 2)} />,

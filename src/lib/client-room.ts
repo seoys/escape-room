@@ -1,4 +1,4 @@
-import { ClientRoom, Room, RoomVariant } from '@/types/room';
+import { ClientRoom, PuzzleVisual, Room, RoomVariant } from '@/types/room';
 
 export function shuffleItems<T>(items: T[]): T[] {
 	const copy = [...items];
@@ -7,6 +7,25 @@ export function shuffleItems<T>(items: T[]): T[] {
 		[copy[i], copy[j]] = [copy[j], copy[i]];
 	}
 	return copy;
+}
+
+// A hidden grid cell shows "?" on screen, so its text may be the masked answer:
+// never let it reach the browser.
+function toClientVisual(
+	visual: PuzzleVisual | undefined,
+): PuzzleVisual | undefined {
+	if (visual?.kind !== 'grid') return visual;
+	return {
+		...visual,
+		rows: visual.rows.map(row =>
+			row.map(cell => {
+				if (cell.mark !== 'hidden') return cell;
+				const { text: _maskedText, ...rest } = cell;
+				void _maskedText;
+				return rest;
+			}),
+		),
+	};
 }
 
 // Whitelist of fields that may reach the browser: never pass `answer` or `variants`.
@@ -28,7 +47,7 @@ export function toClientRoom(
 		comboLength: playable.comboLength,
 		tiles: playable.tiles ? shuffle(playable.tiles) : undefined,
 		tileImages: playable.tileImages,
-		visual: playable.visual,
+		visual: toClientVisual(playable.visual),
 		options: playable.options,
 	};
 }

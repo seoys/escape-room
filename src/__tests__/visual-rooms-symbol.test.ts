@@ -104,6 +104,26 @@ test('room 7: rainbow colors map to digits consistently and the question row mat
 	);
 });
 
+test('room 7: every lamp names its color so it can be told apart without sight of hue', () => {
+	const labelOf: Record<string, string> = {};
+	for (const row of rowsOf(byId(7))) {
+		for (const item of row.items) {
+			assert.ok(item.label, `lamp ${item.color} has no label`);
+			assert.ok(
+				labelOf[item.color!] === undefined ||
+					labelOf[item.color!] === item.label,
+				`${item.color} has two labels`,
+			);
+			labelOf[item.color!] = item.label!;
+		}
+	}
+	assert.equal(
+		new Set(Object.values(labelOf)).size,
+		Object.keys(labelOf).length,
+		'different colors need different labels',
+	);
+});
+
 test('room 12: clock arithmetic wraps at 12 and the question row matches', () => {
 	const rows = rowsOf(byId(12));
 	const visual = byId(12).visual;

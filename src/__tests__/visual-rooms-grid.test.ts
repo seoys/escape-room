@@ -56,11 +56,16 @@ test('room 23: lit tiles read in reading order spell the answer', () => {
 	assert.equal(highlightedInReadingOrder(rows).join(''), byId(23).answer);
 });
 
-test('room 26: right = left × (left + 1); the hidden cell equals the answer', () => {
+test('room 26: right = left × (left + 1); the hidden cell carries no text and its row yields the answer', () => {
 	const { rows } = gridOf(byId(26));
 	for (const [left, right] of rows) {
 		const a = Number(left.text);
 		if (right.mark === 'hidden') {
+			assert.equal(
+				right.text,
+				undefined,
+				'the masked answer must not be in the data',
+			);
 			assert.equal(String(a * (a + 1)), byId(26).answer);
 		} else {
 			assert.equal(Number(right.text), a * (a + 1));

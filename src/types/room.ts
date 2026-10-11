@@ -9,6 +9,7 @@ export type GridCell = {
 export type SymbolItem = {
 	glyph?: string;
 	color?: string;
+	label?: string;
 	op?: '+' | '-' | '×' | '=';
 };
 
