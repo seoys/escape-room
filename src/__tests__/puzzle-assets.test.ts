@@ -10,6 +10,11 @@ const EXPECTED = [
 	'room-13-keys.svg',
 	'room-8-pipes.svg',
 	'room-17-doors.svg',
+	'room-11-a.svg',
+	'room-11-b.svg',
+	'room-11-c.svg',
+	'room-11-d.svg',
+	'room-11-e.svg',
 ];
 
 for (const name of EXPECTED) {
