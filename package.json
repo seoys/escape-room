@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start -p 10050",
     "lint": "next lint",
+    "test": "TSX_TSCONFIG_PATH=tsconfig.test.json node --import tsx --test \"src/__tests__/**/*.test.ts\" \"src/__tests__/**/*.test.tsx\"",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "git:pull": "git pull",
@@ -49,6 +50,7 @@
     "eslint-config-next": "^15.2.4",
     "postcss": "8.4.35",
     "tailwindcss": "3.4.1",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
