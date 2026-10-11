@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/store/gameStore';
 import Image from 'next/image';
@@ -15,7 +15,17 @@ import PuzzleVisualView from '@/components/puzzle-visuals/PuzzleVisualView';
 import SpeedrunTimer from '@/components/SpeedrunTimer';
 import ParticleBackground from '@/components/ParticleBackground';
 import PretextQuestionText from '@/components/PretextQuestionText';
+import LockoutOverlay from '@/components/LockoutOverlay';
 import { TOTAL_ROOMS } from '@/lib/constants';
+import {
+	LockoutState,
+	NO_LOCKOUT,
+	lockoutNotice,
+	readLockout,
+	recordWrongAnswer,
+	resolveLockout,
+	writeLockout,
+} from '@/lib/lockout';
 
 const NO_OPTIONS: ChoiceOption[] = [];
 
@@ -63,6 +73,7 @@ export default function RoomClient({
 	const [toasts, setToasts] = useState<Toast[]>([]);
 	const [inputShake, setInputShake] = useState(false);
 	const [decoyPasscode, setDecoyPasscode] = useState('');
+	const [lockout, setLockout] = useState<LockoutState>(NO_LOCKOUT);
 	const toastIdRef = useRef(0);
 
 	// Show a quiet "checking the lock..." caption while the answer is verified
@@ -99,6 +110,24 @@ export default function RoomClient({
 		setScore(Number.isFinite(storedScore) ? storedScore : 0);
 		setCombo(Number.isFinite(storedCombo) ? storedCombo : 0);
 		setBestCombo(Number.isFinite(storedBestCombo) ? storedBestCombo : 0);
+	}, []);
+
+	// Restore the wrong-answer lockout (an expired lock is cleared here) and follow
+	// changes made by another tab of the same game.
+	useEffect(() => {
+		const sync = () => {
+			const current = resolveLockout(readLockout(localStorage), Date.now());
+			writeLockout(localStorage, current);
+			setLockout(current);
+		};
+		sync();
+		window.addEventListener('storage', sync);
+		return () => window.removeEventListener('storage', sync);
+	}, []);
+
+	const handleUnlock = useCallback(() => {
+		writeLockout(localStorage, NO_LOCKOUT);
+		setLockout(NO_LOCKOUT);
 	}, []);
 
 	useEffect(() => {
@@ -187,7 +216,7 @@ export default function RoomClient({
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (isSubmitting) return;
+		if (isSubmitting || lockout.lockUntil !== null) return;
 
 		setIsSubmitting(true);
 
@@ -257,6 +286,13 @@ export default function RoomClient({
 				setTimeout(() => setInputShake(false), 500);
 				setCombo(0);
 				localStorage.setItem('combo', '0');
+				const now = Date.now();
+				const nextLockout = recordWrongAnswer(
+					resolveLockout(readLockout(localStorage), now),
+					now,
+				);
+				writeLockout(localStorage, nextLockout);
+				setLockout(nextLockout);
 				pushToast('열쇠가 맞지 않습니다.', 'error', 2500);
 				setIsSubmitting(false);
 			}
@@ -272,6 +308,7 @@ export default function RoomClient({
 	const canUseHint = hintsRemaining > 0 && canShowMoreHints;
 
 	const handleHint = () => {
+		if (lockout.lockUntil !== null) return;
 		if (canUseHint) {
 			const nextHints = Math.max(0, hintsRemaining - 1);
 			const nextHintIndex = shownHintsCount;
@@ -334,6 +371,10 @@ export default function RoomClient({
 				fontFamily: 'var(--font-serif)',
 			}}
 		>
+			{lockout.lockUntil !== null && (
+				<LockoutOverlay lockUntil={lockout.lockUntil} onUnlock={handleUnlock} />
+			)}
+
 			{/* Static vignette */}
 			<div className="vignette-bg" />
 
@@ -539,6 +580,13 @@ export default function RoomClient({
 								</button>
 							</div>
 						)}
+
+						<p
+							className="mb-3 text-center text-[11px] text-[#a38a4a]"
+							aria-live="polite"
+						>
+							{lockoutNotice(lockout.wrongCount)}
+						</p>
 
 						{/* Interactive Console Decouple lock/input */}
 						<form onSubmit={handleSubmit} className="flex flex-col gap-6">

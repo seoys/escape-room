@@ -3,6 +3,7 @@ import { devtools } from 'zustand/middleware';
 import { GameState } from '@/types/room';
 import { getBrowserInfo, getIpAddress } from '@/lib/utils/userInfo';
 import { TOTAL_ROOMS } from '@/lib/constants';
+import { clearLockout } from '@/lib/lockout';
 
 const getInitialHintsRemaining = () => {
 	if (typeof window === 'undefined') return 3;
@@ -59,6 +60,7 @@ const store = set => ({
 		localStorage.setItem('score', '0');
 		localStorage.setItem('combo', '0');
 		localStorage.setItem('bestCombo', '0');
+		clearLockout(localStorage);
 		set({
 			currentRoom: 1,
 			hintsRemaining: 3,
